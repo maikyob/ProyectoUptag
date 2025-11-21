@@ -10,6 +10,35 @@
 
 {% block content %}
 <h1>Ventas</h1>
+
+<!-- Datos del cliente -->
+
+
+<form id="form-cliente" class="d-flex flex-wrap align-items-end gap-2 mb-3" style="background:#f8f9fa;padding:10px;border-radius:8px;">
+	{% csrf_token %}
+	<div class="form-group mb-0">
+		<label for="dni" class="form-label mb-0">DNI</label>
+		<input type="text" id="dni" name="dni" class="form-control form-control-sm" style="width:120px;" required>
+	</div>
+	<div class="form-group mb-0">
+		<label for="nombre" class="form-label mb-0">Nombre</label>
+		<input type="text" id="nombre" name="nombre" class="form-control form-control-sm" style="width:120px;" required>
+	</div>
+	<div class="form-group mb-0">
+		<label for="email" class="form-label mb-0">Email</label>
+		<input type="text" id="email" name="email" class="form-control form-control-sm" style="width:120px;">
+	</div>
+	<div class="form-group mb-0">
+		<label for="telefono" class="form-label mb-0">Teléfono</label>
+		<input type="text" id="telefono" name="telefono" class="form-control form-control-sm" style="width:100px;">
+	</div>
+	<div class="form-group mb-0">
+		<label for="direccion" class="form-label mb-0">Dirección</label>
+		<input type="text" id="direccion" name="direccion" class="form-control form-control-sm" style="width:140px;">
+	</div>
+	<button type="submit" class="btn btn-primary btn-sm">Guardar</button>
+</form>
+
 <div class="page-wrapper ms-0">
 	<div class="row">
 		<div class="col-lg-8 col-sm-12 tabs_wrapper">
@@ -29,29 +58,6 @@
 				<select id="producto-select" class="form-select">
 					<option value="">Selecciona un producto</option>
 				</select>
-			</div>
-			<div class="table-responsive">
-				<table class="table datanew">
-					<thead>
-						<tr>
-							<th>
-								<label class="checkboxs">
-									<input type="checkbox" id="select-all">
-									<span class="checkmarks"></span>
-								</label>
-							</th>
-							<th>Nombre del cliente</th>
-							<th>Email</th>
-							<th>telefono</th>
-							<th>Direccion</th>
-							<th>DNI/Cedula de identidad</th>
-							<th>Acción</th>
-						</tr>
-					</thead>
-					<tbody>
-						<!-- Aquí van los datos de la tabla -->
-					</tbody>
-				</table>
 			</div>
 		</div>
         <div class="col-lg-4 col-sm-12">

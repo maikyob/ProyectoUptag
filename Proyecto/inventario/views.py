@@ -94,8 +94,12 @@ def addproduct(request):
     if request.method == 'POST':
         form = ProductoForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('productlist')  # Redirige a la lista de productos después de agregar
+            producto = form.save()
+            # Registrar el producto en MaterialServicio para todos los servicios existentes
+            servicios = Servicio.objects.all()
+            for servicio in servicios:
+                MaterialServicio.objects.create(servicio=servicio, producto=producto, cantidad=1)
+            return redirect('productlist')
     else:
         form = ProductoForm()
     return render(request, 'pages/agregar_producto.html', {'form': form})

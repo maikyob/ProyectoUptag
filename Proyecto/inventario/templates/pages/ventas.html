@@ -26,32 +26,13 @@
 			<!-- Selector de producto dependiente del servicio -->
 			<div class="mb-3">
 				<label for="producto-select" class="form-label">Escoge el producto:</label>
-				<select id="producto-select" class="form-select">
-					<option value="">Selecciona un producto</option>
-				</select>
+				<div class="input-group">
+					<select id="producto-select" class="form-select">
+						<option value="">Selecciona un producto</option>
+					</select>
+					<button id="agregar-btn" type="button" class="btn btn-success ms-2">Agregar</button>
+				</div>
 			</div>
-			<div class="table-responsive">
-				<table class="table datanew">
-					<thead>
-						<tr>
-							<th>
-								<label class="checkboxs">
-									<input type="checkbox" id="select-all">
-									<span class="checkmarks"></span>
-								</label>
-							</th>
-							<th>Nombre del cliente</th>
-							<th>Email</th>
-							<th>telefono</th>
-							<th>Direccion</th>
-							<th>DNI/Cedula de identidad</th>
-							<th>Acción</th>
-						</tr>
-					</thead>
-					<tbody>
-						<!-- Aquí van los datos de la tabla -->
-					</tbody>
-				</table>
 			</div>
 		</div>
         <div class="col-lg-4 col-sm-12">
@@ -108,4 +89,22 @@
 <script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'js/ventas.js' %}"></script>
+<script>
+// Botón para agregar producto/servicio a la lista de compra
+document.getElementById('agregar-btn').addEventListener('click', function() {
+	const productoSelect = document.getElementById('producto-select');
+	const selectedOption = productoSelect.options[productoSelect.selectedIndex];
+	const prodId = selectedOption.value;
+	const prodNombre = selectedOption.textContent;
+	const prodPrecio = parseFloat(selectedOption.getAttribute('data-precio'));
+	const servicioPrecio = parseFloat(productoSelect.getAttribute('data-servicio-precio'));
+	let precioFinal = servicioPrecio > 0 ? servicioPrecio : prodPrecio;
+	if (prodId && prodNombre && !isNaN(precioFinal)) {
+		// Evento personalizado para que ventas.js lo agregue
+		if (typeof window.agregarProductoVenta === 'function') {
+			window.agregarProductoVenta({id: prodId, nombre: prodNombre, precio: precioFinal});
+		}
+	}
+});
+</script>
 {% endblock %}

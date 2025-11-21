@@ -24,8 +24,18 @@ document.getElementById('servicio-select').addEventListener('change', function()
 const productoSelect = document.getElementById('producto-select');
 const listaCompra = document.getElementById('lista-compra');
 const totalPagar = document.getElementById('total-pagar');
+
 let productosCompra = [];
 
+// Permitir agregar desde el botón externo
+window.agregarProductoVenta = function(producto) {
+	if (producto.id && !productosCompra.some(p => p.id === producto.id)) {
+		productosCompra.push(producto);
+		actualizarListaCompra();
+	}
+}
+
+// También permitir agregar desde el select (opcional)
 productoSelect.addEventListener('change', function() {
 	const selectedOption = this.options[this.selectedIndex];
 	const prodId = selectedOption.value;
@@ -34,8 +44,7 @@ productoSelect.addEventListener('change', function() {
 	const servicioPrecio = parseFloat(this.getAttribute('data-servicio-precio'));
 	let precioFinal = servicioPrecio > 0 ? servicioPrecio : prodPrecio;
 	if (prodId && !productosCompra.some(p => p.id === prodId)) {
-		productosCompra.push({id: prodId, nombre: prodNombre, precio: precioFinal});
-		actualizarListaCompra();
+		window.agregarProductoVenta({id: prodId, nombre: prodNombre, precio: precioFinal});
 	}
 });
 

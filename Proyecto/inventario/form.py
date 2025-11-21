@@ -21,3 +21,11 @@ class ClienteForm(forms.ModelForm):
         from .models import Cliente
         model = Cliente
         fields = "__all__"
+
+
+# Formulario para el modelo Servicio
+class ServicioForm(forms.ModelForm):
+    class Meta:
+        from .models import Servicio
+        model = Servicio
+        fields = "__all__"

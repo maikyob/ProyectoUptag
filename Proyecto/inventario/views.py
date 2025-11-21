@@ -1,3 +1,18 @@
+from django.views.decorators.http import require_GET
+# AJAX: productos por servicio
+@require_GET
+def productos_por_servicio(request):
+    servicio_id = request.GET.get('servicio_id')
+    productos = []
+    if servicio_id:
+        materiales = MaterialServicio.objects.filter(servicio_id=servicio_id).select_related('producto')
+        for mat in materiales:
+            productos.append({
+                'id': mat.producto.id,
+                'nombre': mat.producto.nombre,
+                'precio': float(mat.producto.precio_venta)
+            })
+    return JsonResponse({'productos': productos})
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
@@ -88,10 +103,14 @@ def addproduct(request):
 #Ventas
 
 def salelist(request):
-    return render(request, 'pages/ventas.html' )
+    servicios = Servicio.objects.all()
+    return render(request, 'pages/ventas.html', {'servicios': servicios})
 
 def pos(request):
-    return render(request, 'pos.html' )
+    productos = Producto.objects.all()
+    servicios = Servicio.objects.all()
+    clientes = Cliente.objects.all()
+    return render(request, 'pos.html' , {'productos': productos, 'servicios': servicios, 'clientes': clientes})
 
 def salesreturnlist(request):
     return render(request, 'salesreturnlist.html' )

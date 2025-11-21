@@ -11,6 +11,7 @@ urlpatterns = [
     
     #Urls Ventas
     path("saleslist/", views.salelist, name = "saleslist"),
+    path("productos_por_servicio/", views.productos_por_servicio, name="productos_por_servicio"),
     path("pos/", views.pos, name = "pos"),
     path("newsale/", views.pos, name = "newsale"),
     path("salereturnlist/", views.salesreturnlist, name = "salesreturnlist"),

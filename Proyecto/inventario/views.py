@@ -15,6 +15,21 @@ def productos_por_servicio(request):
     return JsonResponse({'productos': productos})
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
+# --- Endpoint AJAX para buscar cliente por DNI ---
+def buscar_cliente(request):
+    dni = request.GET.get('dni', '').strip()
+    data = {'encontrado': False}
+    if dni:
+        cliente = Cliente.objects.filter(dni=dni).first()
+        if cliente:
+            data = {
+                'encontrado': True,
+                'nombre': cliente.nombre,
+                'email': cliente.email,
+                'telefono': cliente.telefono,
+                'direccion': cliente.direccion,
+            }
+    return JsonResponse(data)
 from django.contrib.auth import authenticate, login, logout
 from .form import ProductoForm
 from .form import ClienteForm

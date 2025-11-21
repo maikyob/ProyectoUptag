@@ -23,6 +23,7 @@ urlpatterns = [
     path("clientlist/", views.clientlist, name = "clientlist"),
     path("addclient/", views.addclient, name = "addclient"),
 
+    path("buscar_cliente/", views.buscar_cliente, name="buscar_cliente"),
     #Urls Perfil
     path("profile/", views.profile, name = "profile"),
 ]

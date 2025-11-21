@@ -36,7 +36,6 @@
 		<label for="direccion" class="form-label mb-0">Dirección</label>
 		<input type="text" id="direccion" name="direccion" class="form-control form-control-sm" style="width:140px;">
 	</div>
-	<button type="submit" class="btn btn-primary btn-sm">Guardar</button>
 </form>
 
 <div class="page-wrapper ms-0">
@@ -96,16 +95,18 @@
 					<div class="mb-3">
 						<strong>Total a pagar: $<span id="total-pagar">0.00</span></strong>
 					</div>
-					<div class="setvaluecash">
-						<ul>
-							<li><a href="javascript:void(0);" class="paymentmethod"><img src="{% static 'img/icons/cash.svg' %}" alt="img" class="me-2">Cash</a></li>
-							<li><a href="javascript:void(0);" class="paymentmethod"><img src="{% static 'img/icons/debitcard.svg' %}" alt="img" class="me-2">Debit</a></li>
-							<li><a href="javascript:void(0);" class="paymentmethod"><img src="{% static 'img/icons/scan.svg' %}" alt="img" class="me-2">Scan</a></li>
-						</ul>
+					<div class="setvaluecash mb-3">
+						<label for="metodo-pago" class="form-label">Método de pago:</label>
+						<select id="metodo-pago" class="form-select form-select-sm">
+							<option value="efectivo">Efectivo</option>
+							<option value="debito">Débito</option>
+							<option value="pago_movil">Pago Móvil</option>
+						</select>
 					</div>
-					<div class="btn-totallabel">
+					<div class="btn-totallabel d-flex align-items-center gap-2">
 						<h5>Checkout</h5>
 						<h6><span id="total-pagar">0.00$</span></h6>
+						<button type="button" id="btn-checkout" class="btn btn-primary btn-sm ms-2">Procesar venta</button>
 					</div>
 				</div>
 			</div>
@@ -144,6 +145,55 @@ document.getElementById('dni').addEventListener('blur', function() {
 				alert('Error al buscar el cliente.');
 			});
 	}
+});
+
+// --- Checkout: enviar venta al backend ---
+document.getElementById('btn-checkout').addEventListener('click', function() {
+	// Obtener datos del cliente
+	const cliente = {
+		dni: document.getElementById('dni').value.trim(),
+		nombre: document.getElementById('nombre').value.trim(),
+		email: document.getElementById('email').value.trim(),
+		telefono: document.getElementById('telefono').value.trim(),
+		direccion: document.getElementById('direccion').value.trim()
+	};
+	// Obtener método de pago
+	const metodo_pago = document.getElementById('metodo-pago').value;
+	// Obtener lista de compra
+	if (!window.listaCompra || window.listaCompra.length === 0) {
+		alert('Agrega al menos un producto o servicio a la lista.');
+		return;
+	}
+	// Validar cliente
+	if (!cliente.dni || !cliente.nombre) {
+		alert('Completa los datos del cliente.');
+		return;
+	}
+	// Enviar datos al backend
+	fetch('/registrar_venta/', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+		},
+		body: JSON.stringify({
+			cliente: cliente,
+			metodo_pago: metodo_pago,
+			items: window.listaCompra
+		})
+	})
+	.then(response => response.json())
+	.then(data => {
+		if (data.success) {
+			alert('Venta registrada correctamente.');
+			window.location.reload();
+		} else {
+			alert('Error al registrar la venta: ' + (data.error || '')); 
+		}
+	})
+	.catch(() => {
+		alert('Error de conexión al registrar la venta.');
+	});
 });
 </script>
 {% endblock %}

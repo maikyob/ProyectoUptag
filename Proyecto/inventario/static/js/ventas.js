@@ -103,3 +103,29 @@ document.getElementById('agregar-lista').addEventListener('click', function() {
 		alert('Selecciona servicio y producto');
 	}
 });
+
+// --- Autocompletar cliente por DNI ---
+document.getElementById('dni').addEventListener('blur', function() {
+	const dni = this.value.trim();
+	if (dni.length > 0) {
+		fetch(`/buscar_cliente/?dni=${dni}`)
+			.then(response => response.json())
+			.then(data => {
+				if (data.encontrado) {
+					document.getElementById('nombre').value = data.nombre;
+					document.getElementById('email').value = data.email;
+					document.getElementById('telefono').value = data.telefono;
+					document.getElementById('direccion').value = data.direccion;
+				} else {
+					document.getElementById('nombre').value = '';
+					document.getElementById('email').value = '';
+					document.getElementById('telefono').value = '';
+					document.getElementById('direccion').value = '';
+					alert('Cliente no registrado. Por favor, ingresa los datos para agregarlo.');
+				}
+			})
+			.catch(() => {
+				alert('Error al buscar el cliente.');
+			});
+	}
+});

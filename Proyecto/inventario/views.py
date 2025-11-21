@@ -1,3 +1,49 @@
+from django.views.decorators.csrf import csrf_exempt
+# --- Endpoint para registrar venta ---
+import json
+@csrf_exempt
+def registrar_venta(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            cliente_data = data.get('cliente', {})
+            metodo_pago = data.get('metodo_pago')
+            items = data.get('items', [])
+            # Buscar o crear cliente
+            cliente, _ = Cliente.objects.get_or_create(dni=cliente_data.get('dni'), defaults={
+                'nombre': cliente_data.get('nombre'),
+                'email': cliente_data.get('email'),
+                'telefono': cliente_data.get('telefono'),
+                'direccion': cliente_data.get('direccion'),
+            })
+            # Calcular total de la venta
+            total_venta = sum(float(item.get('precio', 0)) * int(item.get('cantidad', 1)) for item in items)
+            # Crear movimiento de salida (venta)
+            movimiento = Movimiento.objects.create(
+                tipo='salida',
+                total=total_venta,
+                id_cliente=cliente,
+                motivo=f'Venta - Método de pago: {metodo_pago}'
+            )
+            # Registrar cada producto vendido
+            for item in items:
+                producto = Producto.objects.filter(nombre=item.get('producto')).first()
+                cantidad = int(item.get('cantidad', 1))
+                precio = float(item.get('precio', 0))
+                if producto:
+                    DetalleMovimiento.objects.create(
+                        id_movimiento=movimiento,
+                        id_producto=producto,
+                        cantidad=cantidad,
+                        precio_unitario=precio
+                    )
+                    # Actualizar stock
+                    producto.cantidad_en_stock = max(producto.cantidad_en_stock - cantidad, 0)
+                    producto.save()
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})
 from django.views.decorators.http import require_GET
 # AJAX: productos por servicio
 @require_GET

@@ -68,3 +68,38 @@ function actualizarListaCompra() {
 	});
 	totalPagar.textContent = total.toFixed(2);
 }
+
+if (typeof window.listaCompra === 'undefined') {
+	window.listaCompra = [];
+}
+function actualizarTablaCompra() {
+	const tbody = document.querySelector('#tabla-lista-compra tbody');
+	tbody.innerHTML = '';
+	let total = 0;
+	window.listaCompra.forEach((item, idx) => {
+		total += item.precio;
+		const tr = document.createElement('tr');
+		tr.innerHTML = `<td>${item.servicio}</td><td>${item.producto}</td><td>$${item.precio.toFixed(2)}</td><td><button type='button' class='btn btn-danger btn-sm' onclick='quitarItem(${idx})'>Quitar</button></td>`;
+		tbody.appendChild(tr);
+	});
+	document.getElementById('total-pagar').textContent = total.toFixed(2);
+}
+function quitarItem(idx) {
+	window.listaCompra.splice(idx, 1);
+	actualizarTablaCompra();
+}
+document.getElementById('agregar-lista').addEventListener('click', function() {
+	const servicioSelect = document.getElementById('servicio-select');
+	const productoSelect = document.getElementById('producto-select');
+	const servicioText = servicioSelect.options[servicioSelect.selectedIndex]?.text || '';
+	const productoText = productoSelect.options[productoSelect.selectedIndex]?.text || '';
+	let precioServicio = parseFloat(servicioSelect.options[servicioSelect.selectedIndex]?.getAttribute('data-precio')) || 0;
+	let precioProducto = parseFloat(productoSelect.options[productoSelect.selectedIndex]?.getAttribute('data-precio')) || 0;
+	let precio = precioServicio > 0 ? precioServicio : precioProducto;
+	if(servicioSelect.value && productoSelect.value) {
+		window.listaCompra.push({servicio: servicioText, producto: productoText, precio: precio});
+		actualizarTablaCompra();
+	} else {
+		alert('Selecciona servicio y producto');
+	}
+});

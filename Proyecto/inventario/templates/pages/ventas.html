@@ -52,12 +52,15 @@
 					{% endfor %}
 				</select>
 			</div>
-			<!-- Selector de producto dependiente del servicio -->
-			<div class="mb-3">
-				<label for="producto-select" class="form-label">Escoge el producto:</label>
-				<select id="producto-select" class="form-select">
-					<option value="">Selecciona un producto</option>
-				</select>
+			<!-- Selector de producto dependiente del servicio y botón -->
+			<div class="mb-3 d-flex align-items-end gap-2">
+				<div>
+					<label for="producto-select" class="form-label">Escoge el producto:</label>
+					<select id="producto-select" class="form-select">
+						<option value="">Selecciona un producto</option>
+					</select>
+				</div>
+				<button type="button" id="agregar-lista" class="btn btn-success btn-sm mb-1">Agregar a la lista</button>
 			</div>
 		</div>
         <div class="col-lg-4 col-sm-12">
@@ -67,20 +70,31 @@
                         <h5 class="mb-0">Punto de Venta</h5>
                     </div>
 		<div class="col-lg-4 col-sm-12">
-			<script src="{% static 'js/ventas.js' %}"></script>
-						<div class="mt-2">
-							<strong>Total a pagar: $<span id="total-pagar">0.00</span></strong>
-						</div>
 					</div>
 				</div>
 				<div class="split-card"></div>
 				<div class="card-body pt-0 pb-2">
-					<div class="setvalue">
-						<ul>
-							<li><h5>Subtotal </h5><h6>55.00$</h6></li>
-							<li><h5>Tax </h5><h6>5.00$</h6></li>
-							<li class="total-value"><h5>Total </h5><h6>60.00$</h6></li>
-						</ul>
+					<!-- Tabla de lista de compra -->
+					<div class="mb-3">
+						<h6 class="mb-2">Lista de compra</h6>
+						<div class="table-responsive">
+							<table class="table table-bordered" id="tabla-lista-compra">
+								<thead>
+									<tr>
+										<th>Servicio</th>
+										<th>Producto</th>
+										<th>Precio</th>
+										<th>Quitar</th>
+									</tr>
+								</thead>
+								<tbody>
+									<!-- Items agregados dinámicamente -->
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="mb-3">
+						<strong>Total a pagar: $<span id="total-pagar">0.00</span></strong>
 					</div>
 					<div class="setvaluecash">
 						<ul>
@@ -91,16 +105,7 @@
 					</div>
 					<div class="btn-totallabel">
 						<h5>Checkout</h5>
-						<h6>60.00$</h6>
-					</div>
-					<div class="btn-pos">
-						<ul>
-							<li><a class="btn"><img src="{% static 'img/icons/pause1.svg' %}" alt="img" class="me-1">Hold</a></li>
-							<li><a class="btn"><img src="{% static 'img/icons/edit-6.svg' %}" alt="img" class="me-1">Quotation</a></li>
-							<li><a class="btn"><img src="{% static 'img/icons/trash12.svg' %}" alt="img" class="me-1">Void</a></li>
-							<li><a class="btn"><img src="{% static 'img/icons/wallet1.svg' %}" alt="img" class="me-1">Payment</a></li>
-							<li><a class="btn" data-bs-toggle="modal" data-bs-target="#recents"><img src="{% static 'img/icons/transcation.svg' %}" alt="img" class="me-1"> Transaction</a></li>
-						</ul>
+						<h6><span id="total-pagar">0.00$</span></h6>
 					</div>
 				</div>
 			</div>
@@ -114,4 +119,8 @@
 <script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'js/ventas.js' %}"></script>
+<script>
+// Lógica para agregar a la lista de compra y sumar el total
+
+</script>
 {% endblock %}

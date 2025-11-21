@@ -242,7 +242,9 @@ def profile(request):
 #Url Transacciones
 
 def transactions(request):
-    return render(request, 'pages/transacciones.html')
+    transaccion = Movimiento.objects.all()
+    cliente = Cliente.objects.all()
+    return render(request, 'pages/transacciones.html', {'transaccion': transaccion, 'cliente': cliente})
 
 def Hello(request):
     return HttpResponse("Hola")

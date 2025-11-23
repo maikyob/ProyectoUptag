@@ -5,6 +5,7 @@ urlpatterns = [
     # Autenticación: llamadas a vistas propias
     path("signin/", views.signin, name="signin"),
     path("signup/", views.signup, name="signup"),
+    path("signout/", views.signout, name="signout"),
     # Si quieres habilitar las URLs de autenticación de Django (login/logout/password),
     # registra el include en una ruta distinta (opcional):
     path('accounts/', include('django.contrib.auth.urls')),

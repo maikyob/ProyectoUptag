@@ -5,6 +5,7 @@ from .form import ProductoForm
 from .models import usuario
 from .models import Producto
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 
 # Create your views here.
 
@@ -39,10 +40,15 @@ def signup(request):
         try:
             usuario = User.objects.create_user(username=nombre, email=email, password=contraseña, first_name=nombre)
             print(request.POST)
+            login(request, usuario)
             return redirect('signin')
-        except Exception as e:
+        except IntegrityError as e: 
             print(e)
     return render(request, 'pages/register.html',)
+
+def signout(request):
+    logout(request)
+    return redirect('signin')
 
 #Inicio
 def index(request):

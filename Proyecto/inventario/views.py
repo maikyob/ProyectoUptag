@@ -36,32 +36,13 @@ def signup(request):
         nombre = request.POST.get('nombre')
         email = request.POST.get('email')
         contraseña = request.POST.get('contraseña')
-            # Lógica para crear el usuario en la base de datos
-        # Evitar usuarios duplicados por email
-        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-        if User.objects.filter(username=email).exists():
-            # Si existe, devolver error
-            if is_ajax:
-                return JsonResponse({'success': False, 'errors': 'Usuario ya registrado con ese correo.'})
-            return render(request, 'pages/register.html', {'error': 'Usuario ya registrado con ese correo.'})
-
-        # Crear un User de Django (para poder usar authenticate/login después)
-        user = User(username= nombre, email=email)
-        # Guardar el nombre en first_name para mostrarlo en la plantilla
-        user.first_name = nombre or ''
-        user.set_password(contraseña)
-        user.save()
-
-        # Guardar en modelo local `usuario` (opcional). Guardamos contraseña hasheada.
-        from django.contrib.auth.hashers import make_password
-        nuevo_usuario = usuario(nombre=nombre, email=email, contraseña=make_password(contraseña))
-        nuevo_usuario.save()
-
-        if is_ajax:
-            return JsonResponse({'success': True, 'redirect': '/signin/'})
-
-        return redirect('signin')  # Redirige al inicio de sesión después del registro
-    return render(request, 'pages/register.html' )
+        try:
+            usuario = User.objects.create_user(username=nombre, email=email, password=contraseña, first_name=nombre)
+            print(request.POST)
+            return redirect('signin')
+        except Exception as e:
+            print(e)
+    return render(request, 'pages/register.html',)
 
 #Inicio
 def index(request):

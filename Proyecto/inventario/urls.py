@@ -1,9 +1,13 @@
-from django.urls import path
+from django.urls import include, path
 from . import views
 
 urlpatterns = [
-    path("signin/", views.signin, name = "signin"),
-    path("signup/", views.signup, name = "signup"),
+    # Autenticación: llamadas a vistas propias
+    path("signin/", views.signin, name="signin"),
+    path("signup/", views.signup, name="signup"),
+    # Si quieres habilitar las URLs de autenticación de Django (login/logout/password),
+    # registra el include en una ruta distinta (opcional):
+    path('accounts/', include('django.contrib.auth.urls')),
     path("", views.index, name = "index"),
     #Urls Inventario
     path("productlist/", views.productlist, name = "productlist"),

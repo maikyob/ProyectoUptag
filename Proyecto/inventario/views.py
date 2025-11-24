@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, authenticate
 from .form import ProductoForm
 from .models import usuario
 from .models import Producto
@@ -13,23 +13,15 @@ from django.db import IntegrityError
 def signin(request):
     if request.method == 'POST':
         # Aquí iría la lógica para manejar el formulario de inicio de sesión
-        user = authenticate(
+        usuario = authenticate(
             request, 
             username=request.POST.get('email'), 
             password=request.POST.get('contraseña'))
-        # Si la petición es AJAX (fetch/jQuery), devolver JSON
-        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-        if user is None:
-            if is_ajax:
-                return JsonResponse({'success': False, 'errors': 'Credenciales inválidas'})
+        if usuario is None:
             return render(request, 'pages/Login.html', {'error': 'Credenciales inválidas'})
-
-        # Usuario válido
-        login(request, user)
-        if is_ajax:
-            return JsonResponse({'success': True, 'redirect': '/'})
-        return redirect('/')  # Redirige a la página principal después del inicio de sesión
-        
+        else:
+            login(request, usuario)
+            return redirect('/')
     return render(request, 'pages/Login.html' )
 def signup(request):
     if request.method == 'POST':
@@ -38,9 +30,9 @@ def signup(request):
         email = request.POST.get('email')
         contraseña = request.POST.get('contraseña')
         try:
-            usuario = User.objects.create_user(username=nombre, email=email, password=contraseña, first_name=nombre)
+            usuario = User.objects.create_user(username=email, email=email, password=contraseña, first_name=nombre)
+            usuario.save()
             print(request.POST)
-            login(request, usuario)
             return redirect('signin')
         except IntegrityError as e: 
             print(e)

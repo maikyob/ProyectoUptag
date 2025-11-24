@@ -61,53 +61,27 @@ def productos_por_servicio(request):
     return JsonResponse({'productos': productos})
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-# --- Endpoint AJAX para buscar cliente por DNI ---
-def buscar_cliente(request):
-    dni = request.GET.get('dni', '').strip()
-    data = {'encontrado': False}
-    if dni:
-        cliente = Cliente.objects.filter(dni=dni).first()
-        if cliente:
-            data = {
-                'encontrado': True,
-                'nombre': cliente.nombre,
-                'email': cliente.email,
-                'telefono': cliente.telefono,
-                'direccion': cliente.direccion,
-            }
-    return JsonResponse(data)
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, authenticate
 from .form import ProductoForm
 from .form import ClienteForm
 from django.contrib.auth.models import User
-from django.contrib import messages
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib import messages
-from .form import ServicioForm
-from .models import *
+from django.db import IntegrityError
+
 # Create your views here.
 
 #Autenticacion
 def signin(request):
     if request.method == 'POST':
         # Aquí iría la lógica para manejar el formulario de inicio de sesión
-        user = authenticate(
+        usuario = authenticate(
             request, 
             username=request.POST.get('email'), 
             password=request.POST.get('contraseña'))
-        # Si la petición es AJAX (fetch/jQuery), devolver JSON
-        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-        if user is None:
-            if is_ajax:
-                return JsonResponse({'success': False, 'errors': 'Credenciales inválidas'})
+        if usuario is None:
             return render(request, 'pages/Login.html', {'error': 'Credenciales inválidas'})
-
-        # Usuario válido
-        login(request, user)
-        if is_ajax:
-            return JsonResponse({'success': True, 'redirect': '/'})
-        return redirect('/')  # Redirige a la página principal después del inicio de sesión
-        
+        else:
+            login(request, usuario)
+            return redirect('/')
     return render(request, 'pages/Login.html' )
 def signup(request):
     if request.method == 'POST':
@@ -115,32 +89,18 @@ def signup(request):
         nombre = request.POST.get('nombre')
         email = request.POST.get('email')
         contraseña = request.POST.get('contraseña')
-            # Lógica para crear el usuario en la base de datos
-        # Evitar usuarios duplicados por email
-        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-        if User.objects.filter(username=email).exists():
-            # Si existe, devolver error
-            if is_ajax:
-                return JsonResponse({'success': False, 'errors': 'Usuario ya registrado con ese correo.'})
-            return render(request, 'pages/register.html', {'error': 'Usuario ya registrado con ese correo.'})
+        try:
+            usuario = User.objects.create_user(username=email, email=email, password=contraseña, first_name=nombre)
+            usuario.save()
+            print(request.POST)
+            return redirect('signin')
+        except IntegrityError as e: 
+            print(e)
+    return render(request, 'pages/register.html',)
 
-        # Crear un User de Django (para poder usar authenticate/login después)
-        user = User(username= nombre, email=email)
-        # Guardar el nombre en first_name para mostrarlo en la plantilla
-        user.first_name = nombre or ''
-        user.set_password(contraseña)
-        user.save()
-
-        # Guardar en modelo local `usuario` (opcional). Guardamos contraseña hasheada.
-        from django.contrib.auth.hashers import make_password
-        nuevo_usuario = usuario(nombre=nombre, email=email, contraseña=make_password(contraseña))
-        nuevo_usuario.save()
-
-        if is_ajax:
-            return JsonResponse({'success': True, 'redirect': '/signin/'})
-
-        return redirect('signin')  # Redirige al inicio de sesión después del registro
-    return render(request, 'pages/register.html' )
+def signout(request):
+    logout(request)
+    return redirect('signin')
 
 #Inicio
 def index(request):

@@ -199,6 +199,13 @@ def addclient(request):
 def profile(request):
     return render(request,'pages/perfil.html' )
 
+#Url Transacciones
+
+def transactions(request):
+    transaccion = Movimiento.objects.all()
+    cliente = Cliente.objects.all()
+    return render(request, 'pages/transacciones.html', {'transaccion': transaccion, 'cliente': cliente})
+
 def Hello(request):
     return HttpResponse("Hola")
 

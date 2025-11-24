@@ -1,0 +1,59 @@
+{%extends "base.html" %}
+{%load static %}
+
+{% block title %}Transacciones{% endblock %}
+
+{% block content %}
+<h1>Transacciones</h1>
+
+<div class="table-responsive">
+<table id="tabla-transacciones" class="table datanew">
+<thead>
+<tr>
+<th>
+<label class="checkboxs">
+<input type="checkbox" id="select-all">
+<span class="checkmarks"></span>
+</label>
+</th>
+<th>Nombre del Cliente</th>
+<th>cedula</th>
+<th>Fecha</th>
+<th>Metodo de pago</th>
+<th>Pago</th>
+</tr>
+</thead>
+
+<tbody>
+{% for transaccion in transaccion %}
+<tr>
+<td>
+<label class="checkboxs">
+<input type="checkbox">
+<span class="checkmarks"></span>
+</label>
+</td>
+<td>{{ transaccion.id_cliente.nombre }}</td>
+<td> {{ transaccion.id_cliente.dni }}</td>
+<td>{{ transaccion.fecha }}</td>
+<td>{{ transaccion.motivo }}</td>
+<td>{{ transaccion.total }}</td>
+
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/transacciones.js' %}"></script>
+{% endblock %}

@@ -32,4 +32,7 @@ urlpatterns = [
     path("registrar_venta/", views.registrar_venta, name="registrar_venta"),
     #Urls Perfil
     path("profile/", views.profile, name = "profile"),
+
+    #Url Transacciones
+    path("transactions/", views.transactions, name = "transactiones"),
 ]

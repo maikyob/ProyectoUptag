@@ -66,7 +66,8 @@ from .form import ProductoForm
 from .form import ClienteForm
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-
+from .form import ServicioForm
+from .models import *
 # Create your views here.
 
 #Autenticacion
@@ -155,7 +156,7 @@ def addservice(request):
             is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
             if form_service.is_valid():
                 servicio = form_service.save()
-                messages.success(request, 'Servicio agregado correctamente.')
+                
                 if is_ajax:
                     return JsonResponse({'success': True, 'id': servicio.id, 'redirect': '/servicelist'})
                 return redirect('/servicelist')  # Redirige a la lista de servicios después de agregar
@@ -186,7 +187,7 @@ def addclient(request):
         form_client = ClienteForm(request.POST)
         if form_client.is_valid():
             form_client.save()
-            messages.success(request, 'Cliente agregado correctamente.')
+            
             return redirect('clientlist')  # Redirige a la lista de clientes después de agregar
         # Si el formulario no es válido, volver a mostrar con errores
         return render(request, 'pages/agregar_cliente.html', {'form_client': form_client})

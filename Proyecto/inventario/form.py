@@ -29,3 +29,37 @@ class ServicioForm(forms.ModelForm):
         from .models import Servicio
         model = Servicio
         fields = "__all__"
+
+        class LoginForm(forms.Form):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control form-control-sm',
+            'placeholder': 'Ingresa tu usuario',
+            'autocomplete': 'username'
+        }),
+        label="USUARIO",
+        max_length=100
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control form-control-sm',
+            'placeholder': 'Ingresa tu contraseña',
+            'autocomplete': 'current-password'
+        }),
+        label="PASSWORD"
+    )
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Asegurar que los campos tengan las clases correctas
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control form-control-sm',
+            'placeholder': 'Ingresa tu usuario',
+            'autocomplete': 'username'
+        })
+        self.fields['password'].widget.attrs.update({
+            'class': 'form-control form-control-sm',
+            'placeholder': 'Ingresa tu contraseña',
+            'autocomplete': 'current-password'
+        })

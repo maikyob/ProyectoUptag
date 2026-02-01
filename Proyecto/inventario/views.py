@@ -74,6 +74,36 @@ from django.contrib.auth.views import LoginView,PasswordResetView,PasswordResetD
 # Create your views here.
 
 #Autenticacion
+
+def login_view(request): 
+    if request.method == 'POST': 
+        form = LoginForm(request.POST) 
+        if form.is_valid(): 
+            # Validar el usuario y la contraseña 
+            username = form.cleaned_data['username'] 
+            password = form.cleaned_data['password'] 
+            user = authenticate(username=username, password=password) 
+            if user is not None: 
+                login(request, user) 
+                return redirect('/') 
+            else: 
+                form.add_error(None, "Nombre de usuario o contraseña incorrectos.")   
+        else: 
+            # Verificar si hay errores específicos del formulario
+            if form.errors:
+                # Si hay errores de campos específicos, mostrarlos
+                for field, errors in form.errors.items():
+                    if field != '__all__':
+                        for error in errors:
+                            form.add_error(field, error)
+            else:
+                form.add_error(None, "Por favor, verifica los datos ingresados.") 
+    else: 
+        form = LoginForm() 
+    
+    return render(request, 'registration/login.html', {'form': form})
+
+@login_required
 def signin(request):
     if request.method == 'POST':
         # Aquí iría la lógica para manejar el formulario de inicio de sesión

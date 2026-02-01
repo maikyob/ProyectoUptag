@@ -68,6 +68,9 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from .form import ServicioForm
 from .models import *
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView,PasswordResetView,PasswordResetDoneView,PasswordResetConfirmView,PasswordResetCompleteView,PasswordChangeView,PasswordChangeDoneView
+
 # Create your views here.
 
 #Autenticacion
@@ -228,3 +231,29 @@ def Hello(request):
 def about(request):
     return HttpResponse("About")
 
+#ACCOUNTS
+class CustomPasswordResetView(PasswordResetView):
+    template_name="accounts/password_reset.html"
+    
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name="accounts/password_reset_done.html"
+    
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name="accounts/password_reset_confirm.html"
+    def form_valid(self, form): 
+    # Comprueba si el token es válido 
+        if self.validlink: 
+            return super().form_valid(form) 
+        else: 
+            # Renderiza la plantilla con un mensaje de error 
+            context = self.get_context_data() 
+            context['validlink'] = False 
+            return render(self.request, self.template_name, context) 
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name="accounts/password_reset_complete.html"
+    
+class CustomPasswordChangeView(PasswordChangeView):
+    template_name="accounts/password_change.html"
+    
+class CustomPasswordChangeDoneView(PasswordChangeDoneView):
+    template_name="accounts/password_change_done.html"

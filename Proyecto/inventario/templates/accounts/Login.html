@@ -7,6 +7,14 @@
 <div class="login-userheading">
 <h3>Iniciar Sesión</h3>
 </div>
+  <!-- Errores generales del formulario -->
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger alert-sm mb-3">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
 <form action="" method="POST">
 {% csrf_token %}
 <div class="form-login">
@@ -14,13 +22,30 @@
 <div class="form-addons">
 <input type="text" placeholder="Ingrese su correo electrónico" id="email" name="email" required>
 <img src="{% static 'img/icons/mail.svg' %}" alt="img">
+ {% if form.username.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.username.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
 </div>
 </div>
 <div class="form-login">
 <label>Contraseña</label>
 <div class="pass-group">
-<input type="password" class="pass-input" placeholder="Ingrese su contraseña" id="contraseña" name="contraseña" required>
-<span class="fas toggle-password fa-eye-slash"></span>
+    <input type="password" class="pass-input" placeholder="Ingrese su contraseña" id="password" name="password" autocomplete="off" required>
+    {% if form.password.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.password.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+
+    <span class="fas toggle-password fa-eye-slash"></span>
+
 </div>
 </div>
 <div class="form-login">
@@ -32,5 +57,5 @@
 </div>
 {% endblock %}
 {% block scripts %}
-<script src="{% static 'js/login.js' %}"></script>
+
 {% endblock %}

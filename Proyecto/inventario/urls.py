@@ -27,8 +27,6 @@ urlpatterns = [
     #clientes
     path("clientlist/", views.clientlist, name = "clientlist"),
     path("addclient/", views.addclient, name = "addclient"),
-
-    path("buscar_cliente/", views.buscar_cliente, name="buscar_cliente"),
     path("registrar_venta/", views.registrar_venta, name="registrar_venta"),
     #Urls Perfil
     path("profile/", views.profile, name = "profile"),

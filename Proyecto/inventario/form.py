@@ -30,7 +30,7 @@ class ServicioForm(forms.ModelForm):
         model = Servicio
         fields = "__all__"
 
-        class LoginForm(forms.Form):
+class LoginForm(forms.Form):
     username = forms.CharField(
         widget=forms.TextInput(attrs={
             'class': 'form-control form-control-sm',

@@ -66,7 +66,7 @@ from .form import ProductoForm
 from .form import ClienteForm
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-from .form import ServicioForm
+from .form import ServicioForm, LoginForm
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView,PasswordResetView,PasswordResetDoneView,PasswordResetConfirmView,PasswordResetCompleteView,PasswordChangeView,PasswordChangeDoneView

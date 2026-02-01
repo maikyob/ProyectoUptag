@@ -6,7 +6,6 @@
 {% block content %} 
 <div class="login-userheading">
 <h3>Iniciar Sesión</h3>
-</div>
   <!-- Errores generales del formulario -->
                 {% if form.non_field_errors %}
                 <div class="alert alert-danger alert-sm mb-3">
@@ -15,12 +14,15 @@
                     {% endfor %}
                 </div>
                 {% endif %}
+                </div>
 <form action="" method="POST" id="login-form">
+
+
 {% csrf_token %}
 <div class="form-login">
 <label>Correo Electrónico</label>
 <div class="form-addons">
-<input type="text" placeholder="Ingrese su correo electrónico" id="email" name="email" required>
+<input type="text" placeholder="Ingrese su correo electrónico" id="username" name="username" required>
 <img src="{% static 'img/icons/mail.svg' %}" alt="img">
  {% if form.username.errors %}
                         <div class="text-danger small mt-1">

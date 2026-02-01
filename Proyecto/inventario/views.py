@@ -59,7 +59,7 @@ def productos_por_servicio(request):
                 'precio': float(mat.producto.precio_venta)
             })
     return JsonResponse({'productos': productos})
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout, authenticate
 from .form import ProductoForm
@@ -68,6 +68,7 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from .form import ServicioForm, LoginForm
 from .models import *
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView,PasswordResetView,PasswordResetDoneView,PasswordResetConfirmView,PasswordResetCompleteView,PasswordChangeView,PasswordChangeDoneView
 
@@ -160,7 +161,26 @@ def addproduct(request):
     else:
         form = ProductoForm()
     return render(request, 'pages/agregar_producto.html', {'form': form})
+@login_required
+def editar_producto(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    if request.method == 'POST':
+        form = ProductoForm(request.POST, instance=producto)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Producto "{producto.nombre}" actualizado correctamente.')
+            return redirect('productlist')
+    else:
+        form = ProductoForm(instance=producto)
+    return render(request, 'pages/editar_producto.html', {'form': form, 'producto': producto})
 
+@login_required
+def eliminar_producto(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    nombre = producto.nombre
+    producto.delete()
+    messages.success(request, f'Producto "{nombre}" eliminado definitivamente.')
+    return redirect('productlist')
 #Ventas
 
 @login_required

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Editar Producto {% endblock %}
+{% block css %} {% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="page-title">
+        <h4>Editar Producto</h4>
+        <h6>Modifica los datos del producto: {{ producto.nombre }}</h6>
+    </div>
+</div>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label>Nombre del Producto</label>
+                        <input type="text" id="nombre" name="nombre" value="{{ producto.nombre }}" required>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label>Precio de Compra</label>
+                        <input type="text" id="precio_compra" name="precio_compra" value="{{ producto.precio_compra }}"
+                            required>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label>Precio de Venta</label>
+                        <input type="text" id="precio_venta" name="precio_venta" value="{{ producto.precio_venta }}"
+                            required>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label>Proveedor</label>
+                        <select name="proveedor" id="proveedor">
+                            <option value="">Seleccione un proveedor</option>
+                            {% for proveedor in form.fields.proveedor.queryset %}
+                            <option value="{{ proveedor.id }}" {% if producto.proveedor.id==proveedor.id %}selected{%
+                                endif %}>{{ proveedor.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label>Stock</label>
+                        <input type="text" id="cantidad_en_stock" name="cantidad_en_stock"
+                            value="{{ producto.cantidad_en_stock }}" required>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label>Descripcion del producto</label>
+                        <textarea name="descripcion" id="descripcion" required>{{ producto.descripcion }}</textarea>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form-group"></div>
+                    <button type="submit" class="btn btn-submit me-2">Actualizar Producto</button>
+                    <a href="/productlist" class="btn btn-cancel">Cancelar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

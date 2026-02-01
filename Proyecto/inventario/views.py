@@ -104,14 +104,16 @@ def signout(request):
     return redirect('signin')
 
 #Inicio
+@login_required
 def index(request):
     return render(request, 'pages/home.html' )
 
 #Urls Inventario
+@login_required
 def productlist(request):
     productos = Producto.objects.all()
     return render(request, 'pages/inventario.html' , {'productos': productos} )
-
+@login_required
 def addproduct(request):
     if request.method == 'POST':
         form = ProductoForm(request.POST)
@@ -128,28 +130,34 @@ def addproduct(request):
 
 #Ventas
 
+@login_required
 def salelist(request):
     servicios = Servicio.objects.all()
     return render(request, 'pages/ventas.html', {'servicios': servicios})
 
+@login_required
 def pos(request):
     productos = Producto.objects.all()
     servicios = Servicio.objects.all()
     clientes = Cliente.objects.all()
     return render(request, 'pos.html' , {'productos': productos, 'servicios': servicios, 'clientes': clientes})
 
+@login_required
 def salesreturnlist(request):
     return render(request, 'salesreturnlist.html' )
 
+@login_required
 def createsalesreturn(request):
     return render(request, 'createsalesreturn.html' )
 
 #Servicios
 
+@login_required
 def servicelist(request):
     servicios = Servicio.objects.all()
     return render(request, 'pages/servicios.html'  , {'servicios': servicios} )
 
+@login_required
 def addservice(request):
     if request.method == 'POST':
             form_service = ServicioForm(request.POST)
@@ -173,15 +181,18 @@ def addservice(request):
     productos = Producto.objects.all()
     return render(request, 'pages/agregar_servicio.html', {'form_service': form_service, 'productos': productos})
 
+@login_required
 def importpurchase(request):
     return render(request, 'importpurchase.html' )
 
 #Clientes
 
+@login_required
 def clientlist(request):
     clientes = Cliente.objects.all()
     return render(request,'pages/clientlist.html' , {'clientes': clientes} )
 
+@login_required
 def addclient(request):
     if request.method == 'POST':
         form_client = ClienteForm(request.POST)
@@ -197,19 +208,23 @@ def addclient(request):
 
 #Urls Perfil
 
+@login_required
 def profile(request):
     return render(request,'pages/perfil.html' )
 
 #Url Transacciones
 
+@login_required
 def transactions(request):
     transaccion = Movimiento.objects.all()
     cliente = Cliente.objects.all()
     return render(request, 'pages/transacciones.html', {'transaccion': transaccion, 'cliente': cliente})
 
+@login_required
 def Hello(request):
     return HttpResponse("Hola")
 
+@login_required
 def about(request):
     return HttpResponse("About")
 

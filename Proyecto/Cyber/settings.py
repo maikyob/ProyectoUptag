@@ -78,11 +78,11 @@ DATABASES = {
 
         'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'uptag_db',
+        'NAME': 'admin',
         'USER': 'postgres',
-        'PASSWORD': 'marco2112',
+        'PASSWORD': '123456',
         'HOST': 'localhost',
-        'PORT': '5000',
+        'PORT': '5432',
     }
 }
 

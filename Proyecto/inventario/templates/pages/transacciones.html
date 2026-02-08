@@ -10,12 +10,7 @@
     <table id="tabla-transacciones" class="table datanew">
         <thead>
             <tr>
-                <th>
-                    <label class="checkboxs">
-                        <input type="checkbox" id="select-all">
-                        <span class="checkmarks"></span>
-                    </label>
-                </th>
+
                 <th>Nombre del Cliente</th>
                 <th>Cédula (DNI)</th>
                 <th>Fecha</th>
@@ -27,12 +22,6 @@
         <tbody>
             {% for transaccion in transacciones %}
             <tr>
-                <td>
-                    <label class="checkboxs">
-                        <input type="checkbox">
-                        <span class="checkmarks"></span>
-                    </label>
-                </td>
                 <td>{{ transaccion.id_cliente.nombre }}</td>
                 <td> {{ transaccion.id_cliente.dni }}</td>
                 <td>{{ transaccion.fecha }}</td>

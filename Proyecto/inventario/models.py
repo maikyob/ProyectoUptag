@@ -26,6 +26,8 @@ class Producto(models.Model):
     precio_venta = models.DecimalField(max_digits=10, decimal_places=2)
     cantidad_en_stock = models.IntegerField()
     proveedor = models.ForeignKey(Proveedor, null=True, blank=True, on_delete=models.CASCADE)
+    activo = models.BooleanField(default=True)
+
 
 
 class Servicio(models.Model):

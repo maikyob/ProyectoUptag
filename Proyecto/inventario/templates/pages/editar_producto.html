@@ -13,7 +13,7 @@
     </div>
 </div>
 
-<form action="" method="POST">
+<form action="{% url 'editar_producto' producto.pk %}" method="POST">
     {% csrf_token %}
     <div class="card">
         <div class="card-body">
@@ -44,7 +44,7 @@
                         <select name="proveedor" id="proveedor">
                             <option value="">Seleccione un proveedor</option>
                             {% for proveedor in form.fields.proveedor.queryset %}
-                            <option value="{{ proveedor.id }}" {% if producto.proveedor.id==proveedor.id %}selected{%
+                            <option value="{{ proveedor.id }}" {% if producto.proveedor.id == proveedor.id %}selected{%
                                 endif %}>{{ proveedor.nombre }}</option>
                             {% endfor %}
                         </select>

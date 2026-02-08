@@ -1,73 +1,13 @@
-from django.views.decorators.csrf import csrf_exempt
-# --- Endpoint para registrar venta ---
-import json
-@csrf_exempt
-def registrar_venta(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            cliente_data = data.get('cliente', {})
-            metodo_pago = data.get('metodo_pago')
-            items = data.get('items', [])
-            # Buscar o crear cliente
-            cliente, _ = Cliente.objects.get_or_create(dni=cliente_data.get('dni'), defaults={
-                'nombre': cliente_data.get('nombre'),
-                'email': cliente_data.get('email'),
-                'telefono': cliente_data.get('telefono'),
-                'direccion': cliente_data.get('direccion'),
-            })
-            # Calcular total de la venta
-            total_venta = sum(float(item.get('precio', 0)) * int(item.get('cantidad', 1)) for item in items)
-            # Crear movimiento de salida (venta)
-            movimiento = Movimiento.objects.create(
-                tipo='salida',
-                total=total_venta,
-                id_cliente=cliente,
-                motivo=f'Venta - Método de pago: {metodo_pago}'
-            )
-            # Registrar cada producto vendido
-            for item in items:
-                producto = Producto.objects.filter(nombre=item.get('producto')).first()
-                cantidad = int(item.get('cantidad', 1))
-                precio = float(item.get('precio', 0))
-                if producto:
-                    DetalleMovimiento.objects.create(
-                        id_movimiento=movimiento,
-                        id_producto=producto,
-                        cantidad=cantidad,
-                        precio_unitario=precio
-                    )
-                    # Actualizar stock
-                    producto.cantidad_en_stock = max(producto.cantidad_en_stock - cantidad, 0)
-                    producto.save()
-            return JsonResponse({'success': True})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    return JsonResponse({'success': False, 'error': 'Método no permitido'})
-from django.views.decorators.http import require_GET
-# AJAX: productos por servicio
-@require_GET
-def productos_por_servicio(request):
-    servicio_id = request.GET.get('servicio_id')
-    productos = []
-    if servicio_id:
-        materiales = MaterialServicio.objects.filter(servicio_id=servicio_id).select_related('producto')
-        for mat in materiales:
-            productos.append({
-                'id': mat.producto.id,
-                'nombre': mat.producto.nombre,
-                'precio': float(mat.producto.precio_venta)
-            })
-    return JsonResponse({'productos': productos})
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.http import HttpResponse, JsonResponse
-from django.contrib.auth import authenticate, login, logout, authenticate
-from .form import ProductoForm
+import json
+from django.views.decorators.http import require_POST
+from django.db import transaction
+from django.contrib.auth import authenticate, login, logout
+from .form import ProductoForm, LoginForm, ServicioForm
+from .models import *
 from .form import ClienteForm
 from django.contrib.auth.models import User
-from django.db import IntegrityError
-from .form import ServicioForm, LoginForm
-from .models import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView,PasswordResetView,PasswordResetDoneView,PasswordResetConfirmView,PasswordResetCompleteView,PasswordChangeView,PasswordChangeDoneView
@@ -75,7 +15,6 @@ from django.contrib.auth.views import LoginView,PasswordResetView,PasswordResetD
 # Create your views here.
 
 #Autenticacion
-
 def login_view(request): 
     if request.method == 'POST': 
         form = LoginForm(request.POST) 
@@ -102,40 +41,43 @@ def login_view(request):
     else: 
         form = LoginForm() 
     
-    return render(request, 'registration/login.html', {'form': form})
-
+    return render(request, 'accounts/login.html', {'form': form})
 @login_required
-def signin(request):
-    if request.method == 'POST':
-        # Aquí iría la lógica para manejar el formulario de inicio de sesión
-        usuario = authenticate(
-            request, 
-            username=request.POST.get('email'), 
-            password=request.POST.get('contraseña'))
-        if usuario is None:
-            return render(request, 'pages/Login.html', {'error': 'Credenciales inválidas'})
-        else:
-            login(request, usuario)
-            return redirect('/')
-    return render(request, 'pages/Login.html' )
+def salir(request):
+    logout(request)
+    return redirect('login')
+
+
+
 def signup(request):
     if request.method == 'POST':
         # Aquí iría la lógica para manejar el formulario de registro
-        nombre = request.POST.get('nombre')
+        nombre = request.POST.get('username')
         email = request.POST.get('email')
-        contraseña = request.POST.get('contraseña')
-        try:
-            usuario = User.objects.create_user(username=email, email=email, password=contraseña, first_name=nombre)
-            usuario.save()
-            print(request.POST)
-            return redirect('signin')
-        except IntegrityError as e: 
-            print(e)
-    return render(request, 'pages/register.html',)
+        contraseña = request.POST.get('password')
+            # Lógica para crear el usuario en la base de datos
+        # Evitar usuarios duplicados por email
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        if User.objects.filter(email=email).exists():
+            # Si existe, devolver error
+            if is_ajax:
+                return JsonResponse({'success': False, 'errors': 'Ese correo electrónico ya está registrado.'})
+            return render(request, 'accounts/signup.html', {'error': 'Ese correo electrónico ya está registrado.'})
 
-def signout(request):
-    logout(request)
-    return redirect('signin')
+        if User.objects.filter(username=nombre).exists():
+            # Si el nombre de usuario existe, devolver error
+            if is_ajax:
+                return JsonResponse({'success': False, 'errors': 'El nombre de usuario ya está en uso.'})
+            return render(request, 'accounts/signup.html', {'error': 'El nombre de usuario ya está en uso.'})
+
+        # Crear un User de Django (para poder usar authenticate/login después)
+        user = User(username= nombre, email=email)
+        # Guardar el nombre en first_name para mostrarlo en la plantilla
+        user.first_name = nombre or ''
+        user.set_password(contraseña)
+        user.save()
+        return redirect('login')  # Redirige al inicio de sesión después del registro
+    return render(request, 'accounts/signup.html' )
 
 #Inicio
 @login_required
@@ -145,22 +87,9 @@ def index(request):
 #Urls Inventario
 @login_required
 def productlist(request):
-    productos = Producto.objects.all()
+    productos = Producto.objects.filter(activo=True)
     return render(request, 'pages/inventario.html' , {'productos': productos} )
-@login_required
-def addproduct(request):
-    if request.method == 'POST':
-        form = ProductoForm(request.POST)
-        if form.is_valid():
-            producto = form.save()
-            # Registrar el producto en MaterialServicio para todos los servicios existentes
-            servicios = Servicio.objects.all()
-            for servicio in servicios:
-                MaterialServicio.objects.create(servicio=servicio, producto=producto, cantidad=1)
-            return redirect('productlist')
-    else:
-        form = ProductoForm()
-    return render(request, 'pages/agregar_producto.html', {'form': form})
+
 @login_required
 def editar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
@@ -181,35 +110,40 @@ def eliminar_producto(request, pk):
     producto.delete()
     messages.success(request, f'Producto "{nombre}" eliminado definitivamente.')
     return redirect('productlist')
-#Ventas
 
+@login_required
+def addproduct(request):
+    if request.method == 'POST':
+        form = ProductoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('productlist')  # Redirige a la lista de productos después de agregar
+    else:
+        form = ProductoForm()
+    return render(request, 'pages/agregar_producto.html', {'form': form})
+
+#Ventas
 @login_required
 def salelist(request):
     servicios = Servicio.objects.all()
-    return render(request, 'pages/ventas.html', {'servicios': servicios})
-
+    # Enviamos todos los productos activos por defecto
+    productos = Producto.objects.filter(activo=True)
+    return render(request, 'pages/ventas.html', {'servicios': servicios, 'productos': productos})
 @login_required
 def pos(request):
-    productos = Producto.objects.all()
-    servicios = Servicio.objects.all()
-    clientes = Cliente.objects.all()
-    return render(request, 'pos.html' , {'productos': productos, 'servicios': servicios, 'clientes': clientes})
-
+    return render(request, 'pos.html' )
 @login_required
 def salesreturnlist(request):
     return render(request, 'salesreturnlist.html' )
-
 @login_required
 def createsalesreturn(request):
     return render(request, 'createsalesreturn.html' )
 
 #Servicios
-
 @login_required
 def servicelist(request):
     servicios = Servicio.objects.all()
-    return render(request, 'pages/servicios.html'  , {'servicios': servicios} )
-
+    return render(request, 'pages/servicios.html', {'servicios': servicios})
 @login_required
 def addservice(request):
     if request.method == 'POST':
@@ -219,8 +153,8 @@ def addservice(request):
                 servicio = form_service.save()
                 
                 if is_ajax:
-                    return JsonResponse({'success': True, 'id': servicio.id, 'redirect': '/servicelist'})
-                return redirect('/servicelist')  # Redirige a la lista de servicios después de agregar
+                    return JsonResponse({'success': True, 'id': servicio.id, 'redirect': reverse('servicelist')})
+                return redirect('servicelist')  # Redirige a la lista de servicios después de agregar
             # Si el formulario no es válido, devolver errores JSON para AJAX o renderizar plantilla
             if is_ajax:
                 # serialize form errors
@@ -235,51 +169,197 @@ def addservice(request):
     return render(request, 'pages/agregar_servicio.html', {'form_service': form_service, 'productos': productos})
 
 @login_required
+def edit_service(request, pk):
+    servicio = get_object_or_404(Servicio, pk=pk)
+    if request.method == 'POST':
+        form_service = ServicioForm(request.POST, instance=servicio)
+        if form_service.is_valid():
+            form_service.save()
+            messages.success(request, 'Servicio actualizado correctamente.')
+            return redirect('servicelist')
+        return render(request, 'pages/editar_servicio.html', {'form_service': form_service, 'servicio': servicio})
+    else:
+        form_service = ServicioForm(instance=servicio)
+    return render(request, 'pages/editar_servicio.html', {'form_service': form_service, 'servicio': servicio})
+
+@login_required
+def delete_service(request, pk):
+    servicio = get_object_or_404(Servicio, pk=pk)
+    servicio.delete()
+    messages.success(request, 'Servicio eliminado correctamente.')
+    return redirect('servicelist')
+
+@login_required
+def addpurchase(request):
+    return render(request, 'addpurchase.html' )
+
+# AJAX Views for POS
+@login_required
+def buscar_cliente(request):
+    dni = request.GET.get('dni')
+    try:
+        cliente = Cliente.objects.get(dni=dni)
+        return JsonResponse({
+            'encontrado': True,
+            'nombre': cliente.nombre,
+            'email': cliente.email,
+            'telefono': cliente.telefono,
+            'direccion': cliente.direccion
+        })
+    except Cliente.DoesNotExist:
+        return JsonResponse({'encontrado': False})
+
+@login_required
+def get_productos_servicio(request, servicio_id):
+    materiales = MaterialServicio.objects.filter(servicio_id=servicio_id).select_related('producto')
+    
+    if materiales.exists():
+        productos = [{
+            'id': m.producto.id,
+            'nombre': m.producto.nombre,
+            'precio': float(m.producto.precio_venta),
+            'stock': m.producto.cantidad_en_stock
+        } for m in materiales]
+    else:
+        # Fallback: Si no hay materiales vinculados, mostrar todos los productos activos
+        all_prods = Producto.objects.filter(activo=True)
+        productos = [{
+            'id': p.id,
+            'nombre': p.nombre,
+            'precio': float(p.precio_venta),
+            'stock': p.cantidad_en_stock
+        } for p in all_prods]
+        
+    return JsonResponse({'productos': productos})
+
+@login_required
+@require_POST
+def registrar_venta(request):
+    try:
+        data = json.loads(request.body)
+        cliente_data = data.get('cliente')
+        metodo_pago = data.get('metodo_pago')
+        items = data.get('items')
+        
+        if not items:
+            return JsonResponse({'success': False, 'error': 'No hay items en la venta'})
+
+        with transaction.atomic():
+            # 1. Obtener o crear cliente
+            cliente, created = Cliente.objects.get_or_create(
+                dni=cliente_data['dni'],
+                defaults={
+                    'nombre': cliente_data['nombre'],
+                    'email': cliente_data.get('email', ''),
+                    'telefono': cliente_data.get('telefono', ''),
+                    'direccion': cliente_data.get('direccion', '')
+                }
+            )
+            
+            # Calcular total
+            total_venta = sum(float(item['precio']) for item in items)
+            
+            # 2. Crear Movimiento (Venta)
+            movimiento = Movimiento.objects.create(
+                tipo='salida',
+                total=total_venta,
+                id_cliente=cliente,
+                motivo=f"Venta POS ({metodo_pago})"
+            )
+            
+            # 3. Detalles y Stock
+            for item in items:
+                # Si es un producto tangible (no solo un servicio)
+                if item.get('producto_id'):
+                    producto = Producto.objects.select_for_update().get(id=item['producto_id'])
+                    if producto.cantidad_en_stock < 1:
+                        raise ValueError(f"Sin stock para {producto.nombre}")
+                    
+                    # Descontar stock (asumiendo cantidad 1 por ahora según UI)
+                    producto.cantidad_en_stock -= 1
+                    producto.save()
+                    
+                    DetalleMovimiento.objects.create(
+                        id_movimiento=movimiento,
+                        id_producto=producto,
+                        cantidad=1,
+                        precio_unitario=item['precio']
+                    )
+                
+                # Registrar servicio realizado
+                if item.get('servicio_id'):
+                    ServicioRealizado.objects.create(
+                        servicio_id=item['servicio_id'],
+                        fecha=movimiento.fecha.date(),
+                        cliente=cliente.nombre,
+                        costo=item['precio']
+                    )
+
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+@login_required
 def importpurchase(request):
     return render(request, 'importpurchase.html' )
 
 #Clientes
-
 @login_required
 def clientlist(request):
     clientes = Cliente.objects.all()
     return render(request,'pages/clientlist.html' , {'clientes': clientes} )
-
 @login_required
 def addclient(request):
     if request.method == 'POST':
         form_client = ClienteForm(request.POST)
         if form_client.is_valid():
             form_client.save()
-            
-            return redirect('clientlist')  # Redirige a la lista de clientes después de agregar
-        # Si el formulario no es válido, volver a mostrar con errores
+            messages.success(request, 'Cliente agregado correctamente.')
+            return redirect('clientlist')
         return render(request, 'pages/agregar_cliente.html', {'form_client': form_client})
     else:
         form_client = ClienteForm()
     return render(request, 'pages/agregar_cliente.html', {'form_client': form_client})
 
-#Urls Perfil
+@login_required
+def edit_client(request, pk):
+    cliente = get_object_or_404(Cliente, pk=pk)
+    if request.method == 'POST':
+        form_client = ClienteForm(request.POST, instance=cliente)
+        if form_client.is_valid():
+            form_client.save()
+            messages.success(request, 'Cliente actualizado correctamente.')
+            return redirect('clientlist')
+        return render(request, 'pages/editar_cliente.html', {'form_client': form_client, 'cliente': cliente})
+    else:
+        form_client = ClienteForm(instance=cliente)
+    return render(request, 'pages/editar_cliente.html', {'form_client': form_client, 'cliente': cliente})
 
 @login_required
-def profile(request):
-    return render(request,'pages/perfil.html' )
+def delete_client(request, pk):
+    cliente = get_object_or_404(Cliente, pk=pk)
+    cliente.delete()
+    messages.success(request, 'Cliente eliminado correctamente.')
+    return redirect('clientlist')
 
-#Url Transacciones
 
 @login_required
 def transactions(request):
-    transaccion = Movimiento.objects.all()
-    cliente = Cliente.objects.all()
-    return render(request, 'pages/transacciones.html', {'transaccion': transaccion, 'cliente': cliente})
+    transacciones = Movimiento.objects.all()
+    clientes = Cliente.objects.all()
+    return render(request, 'pages/transacciones.html', {'transacciones': transacciones, 'clientes': clientes})
 
+
+#Urls Perfil
+@login_required
+def profile(request):
+    return render(request,'pages/perfil.html' )
 @login_required
 def Hello(request):
     return HttpResponse("Hola")
-
 @login_required
 def about(request):
     return HttpResponse("About")
+
 
 #ACCOUNTS
 class CustomPasswordResetView(PasswordResetView):

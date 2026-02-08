@@ -1,0 +1,62 @@
+{% extends "base_login_register.html" %}
+{% load static %}
+{% block css %}{% endblock %}
+{% block title %} Iniciar Sesión {% endblock %}
+
+{% block content %}
+<div class="login-userheading">
+    <h3>Iniciar Sesión</h3>
+</div>
+<!-- Errores generales del formulario -->
+{% if form.non_field_errors %}
+<div class="alert alert-danger alert-sm mb-3">
+    {% for error in form.non_field_errors %}
+    {{ error }}
+    {% endfor %}
+</div>
+{% endif %}
+<form action="{% url 'login' %}" method="POST" id="login-form">
+    {% csrf_token %}
+    <div class="form-login">
+        <label>Correo Electrónico</label>
+        <div class="form-addons">
+            <input type="text" placeholder="Ingrese su usuario" id="username" name="username" required>
+            {% if form.username.errors %}
+            <div class="text-danger small mt-1">
+                {% for error in form.username.errors %}
+                {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            <img src="{% static 'img/icons/mail.svg' %}" alt="img">
+        </div>
+    </div>
+    <div class="form-login">
+        <label>Contraseña</label>
+        <div class="pass-group">
+            <input type="password" class="pass-input" placeholder="Ingrese su contraseña" id="password" name="password"
+                autocomplete="off" required>
+            {% if form.password.errors %}
+            <div class="text-danger small mt-1">
+                {% for error in form.password.errors %}
+                {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            <span class="fas toggle-password fa-eye-slash"></span>
+        </div>
+    </div>
+    <div class="form-login">
+        <button type="submit" class="btn btn-login">Iniciar Sesión</button>
+    </div>
+    <div class="form-login text-center">
+        <a href="{% url 'password_reset' %}" class="hover-a">¿Olvidaste tu contraseña?</a>
+    </div>
+</form>
+<div class="signinform text-center">
+    <h4>¿No tienes una cuenta? <a href="{% url 'signup' %}" class="hover-a">Regístrate</a></h4>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/login.js' %}"></script>
+{% endblock %}

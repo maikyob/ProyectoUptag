@@ -1,0 +1,25 @@
+{% extends '../layout.html'%} {%load static%} 
+{% block 'titulo'%} 
+{% endblock%} 
+{% block 'titulo_header'%} <i class="fa fa-lock"></i> Restringido {%endblock%} 
+{%block content%}
+<div class="row">
+  <div class="col-sm-6 m-auto">
+    <div class="card mt-4">
+      <div class="card-header">
+        <div class="card-title w-100 text-center">
+          <h5 class="text-title text-center">ACCESO RESTRINGIDO</h5>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="text-center">
+          No tiene los suficientes provilegios para acceder a esta sección.
+        </p>
+      </div>
+      <div class="card-footer text-center">
+        <a href="/" class="btn btn-primary">Volver</a>
+      </div>
+    </div>
+  </div>
+</div>
+{%endblock%}

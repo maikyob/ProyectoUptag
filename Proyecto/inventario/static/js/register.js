@@ -1,4 +1,4 @@
-;(function($){
+/* ;(function($){
     $(function(){
         var $form = $('form');
         if ($form.length === 0) return;
@@ -82,3 +82,4 @@
 
     });
 })(jQuery);
+ */

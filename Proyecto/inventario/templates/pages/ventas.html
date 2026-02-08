@@ -14,7 +14,8 @@
 <!-- Datos del cliente -->
 
 
-<form id="form-cliente" class="d-flex flex-wrap align-items-end gap-2 mb-3" style="background:#f8f9fa;padding:10px;border-radius:8px;">
+<form id="form-cliente" class="d-flex flex-wrap align-items-end gap-2 mb-3"
+	style="background:#f8f9fa;padding:10px;border-radius:8px;">
 	{% csrf_token %}
 	<div class="form-group mb-0">
 		<label for="dni" class="form-label mb-0">DNI</label>
@@ -48,7 +49,7 @@
 				<select id="servicio-select" class="form-select">
 					<option value="">Selecciona un servicio</option>
 					{% for servicio in servicios %}
-						<option value="{{ servicio.id }}" data-precio="{{ servicio.precio }}">{{ servicio.nombre }}</option>
+					<option value="{{ servicio.id }}" data-precio="{{ servicio.precio }}">{{ servicio.nombre }}</option>
 					{% endfor %}
 				</select>
 			</div>
@@ -57,19 +58,25 @@
 				<div>
 					<label for="producto-select" class="form-label">Escoge el producto:</label>
 					<select id="producto-select" class="form-select">
-						<option value="">Selecciona un producto</option>
+						<option value="">Selecciona un producto (Opcional)</option>
+						{% for producto in productos %}
+						<option value="{{ producto.id }}" data-precio="{{ producto.precio_venta }}"
+							data-nombre="{{ producto.nombre }}">
+							{{ producto.nombre }} (${{ producto.precio_venta }})
+						</option>
+						{% endfor %}
 					</select>
 				</div>
 				<button type="button" id="agregar-lista" class="btn btn-success btn-sm mb-1">Agregar a la lista</button>
 			</div>
 		</div>
-        <div class="col-lg-4 col-sm-12">
-            <div class="card pos-card">
-                <div class="card-header pos-header d-flex justify-content-between align-items-center">
-                    <div class="col-lg-8 col-sm-12">
-                        <h5 class="mb-0">Punto de Venta</h5>
-                    </div>
 		<div class="col-lg-4 col-sm-12">
+			<div class="card pos-card">
+				<div class="card-header pos-header d-flex justify-content-between align-items-center">
+					<div class="col-lg-8 col-sm-12">
+						<h5 class="mb-0">Punto de Venta</h5>
+					</div>
+					<div class="col-lg-4 col-sm-12">
 					</div>
 				</div>
 				<div class="split-card"></div>
@@ -107,7 +114,8 @@
 					<div class="btn-totallabel d-flex align-items-center gap-2">
 						<h5>Checkout</h5>
 						<h6><span id="total-pagar">0.00$</span></h6>
-						<button type="button" id="btn-checkout" class="btn btn-primary btn-sm ms-2">Procesar venta</button>
+						<button type="button" id="btn-checkout" class="btn btn-primary btn-sm ms-2">Procesar
+							venta</button>
 					</div>
 				</div>
 			</div>
@@ -119,82 +127,165 @@
 {% block scripts %}
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
-<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
 <script src="{% static 'js/ventas.js' %}"></script>
 <script>
-// --- Autocompletar cliente por DNI ---
-document.getElementById('dni').addEventListener('blur', function() {
-	const dni = this.value.trim();
-	if (dni.length > 0) {
-		fetch(`/buscar_cliente/?dni=${dni}`)
+	// --- Autocompletar cliente por DNI ---
+	document.getElementById('dni').addEventListener('blur', function () {
+		const dni = this.value.trim();
+		if (dni.length > 0) {
+			fetch(`/buscar_cliente/?dni=${dni}`)
+				.then(response => response.json())
+				.then(data => {
+					if (data.encontrado) {
+						document.getElementById('nombre').value = data.nombre;
+						document.getElementById('email').value = data.email;
+						document.getElementById('telefono').value = data.telefono;
+						document.getElementById('direccion').value = data.direccion;
+					} else {
+						document.getElementById('nombre').value = '';
+						document.getElementById('email').value = '';
+						document.getElementById('telefono').value = '';
+						document.getElementById('direccion').value = '';
+						// alert('Cliente no registrado. Por favor, ingresa los datos para agregarlo.');
+					}
+				})
+				.catch(() => {
+					console.error('Error al buscar el cliente.');
+				});
+		}
+	});
+
+	// --- Cargar productos al seleccionar servicio ---
+	document.getElementById('servicio-select').addEventListener('change', function () {
+		const servicioId = this.value;
+		const productoSelect = document.getElementById('producto-select');
+		productoSelect.innerHTML = '<option value="">Selecciona un producto</option>';
+
+		if (servicioId) {
+			fetch(`/get_productos_servicio/${servicioId}/`)
+				.then(response => response.json())
+				.then(data => {
+					data.productos.forEach(prod => {
+						const option = document.createElement('option');
+						option.value = prod.id;
+						option.text = `${prod.nombre} ($${prod.precio})`;
+						option.dataset.precio = prod.precio;
+						option.dataset.nombre = prod.nombre;
+						productoSelect.appendChild(option);
+					});
+				});
+		}
+	});
+
+	// --- Manejo de la lista de compra ---
+	window.listaCompra = [];
+
+	document.getElementById('agregar-lista').addEventListener('click', function () {
+		const servicioSelect = document.getElementById('servicio-select');
+		const productoSelect = document.getElementById('producto-select');
+
+		const servicioId = servicioSelect.value;
+		const servicioNombre = servicioSelect.options[servicioSelect.selectedIndex].text;
+		const servicioPrecio = parseFloat(servicioSelect.options[servicioSelect.selectedIndex].dataset.precio || 0);
+
+		const productoId = productoSelect.value;
+		const productoNombre = productoId ? productoSelect.options[productoSelect.selectedIndex].dataset.nombre : 'N/A';
+		const productoPrecio = productoId ? parseFloat(productoSelect.options[productoSelect.selectedIndex].dataset.precio || 0) : 0;
+
+		if (!servicioId) {
+			alert('Selecciona al menos un servicio.');
+			return;
+		}
+
+		const item = {
+			servicio_id: servicioId,
+			servicio_nombre: servicioNombre,
+			producto_id: productoId || null,
+			producto_nombre: productoNombre,
+			precio: servicioPrecio + productoPrecio
+		};
+
+		window.listaCompra.push(item);
+		actualizarTabla();
+	});
+
+	function actualizarTabla() {
+		const tbody = document.querySelector('#tabla-lista-compra tbody');
+		tbody.innerHTML = '';
+		let total = 0;
+
+		window.listaCompra.forEach((item, index) => {
+			total += item.precio;
+			const row = `
+				<tr>
+					<td>${item.servicio_nombre}</td>
+					<td>${item.producto_nombre}</td>
+					<td>$${item.precio.toFixed(2)}</td>
+					<td><button class="btn btn-danger btn-sm" onclick="quitarItem(${index})">X</button></td>
+				</tr>
+			`;
+			tbody.innerHTML += row;
+		});
+
+		document.getElementById('total-pagar').innerText = total.toFixed(2);
+		// Actualizar el total en el checkout también
+		document.querySelectorAll('#total-pagar').forEach(el => el.innerText = total.toFixed(2) + '$');
+	}
+
+	window.quitarItem = function (index) {
+		window.listaCompra.splice(index, 1);
+		actualizarTabla();
+	}
+
+	// --- Checkout: enviar venta al backend ---
+	document.getElementById('btn-checkout').addEventListener('click', function () {
+		// Obtener datos del cliente
+		const cliente = {
+			dni: document.getElementById('dni').value.trim(),
+			nombre: document.getElementById('nombre').value.trim(),
+			email: document.getElementById('email').value.trim(),
+			telefono: document.getElementById('telefono').value.trim(),
+			direccion: document.getElementById('direccion').value.trim()
+		};
+		// Obtener método de pago
+		const metodo_pago = document.getElementById('metodo-pago').value;
+		// Obtener lista de compra
+		if (!window.listaCompra || window.listaCompra.length === 0) {
+			alert('Agrega al menos un producto o servicio a la lista.');
+			return;
+		}
+		// Validar cliente
+		if (!cliente.dni || !cliente.nombre) {
+			alert('Completa los datos del cliente (DNI y Nombre son obligatorios).');
+			return;
+		}
+		// Enviar datos al backend
+		fetch('/registrar_venta/', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+			},
+			body: JSON.stringify({
+				cliente: cliente,
+				metodo_pago: metodo_pago,
+				items: window.listaCompra
+			})
+		})
 			.then(response => response.json())
 			.then(data => {
-				if (data.encontrado) {
-					document.getElementById('nombre').value = data.nombre;
-					document.getElementById('email').value = data.email;
-					document.getElementById('telefono').value = data.telefono;
-					document.getElementById('direccion').value = data.direccion;
+				if (data.success) {
+					alert('Venta registrada correctamente.');
+					window.location.reload();
 				} else {
-					document.getElementById('nombre').value = '';
-					document.getElementById('email').value = '';
-					document.getElementById('telefono').value = '';
-					document.getElementById('direccion').value = '';
-					alert('Cliente no registrado. Por favor, ingresa los datos para agregarlo.');
+					alert('Error al registrar la venta: ' + (data.error || ''));
 				}
 			})
-			.catch(() => {
-				alert('Error al buscar el cliente.');
+			.catch(err => {
+				console.error(err);
+				alert('Error de conexión al registrar la venta.');
 			});
-	}
-});
-
-// --- Checkout: enviar venta al backend ---
-document.getElementById('btn-checkout').addEventListener('click', function() {
-	// Obtener datos del cliente
-	const cliente = {
-		dni: document.getElementById('dni').value.trim(),
-		nombre: document.getElementById('nombre').value.trim(),
-		email: document.getElementById('email').value.trim(),
-		telefono: document.getElementById('telefono').value.trim(),
-		direccion: document.getElementById('direccion').value.trim()
-	};
-	// Obtener método de pago
-	const metodo_pago = document.getElementById('metodo-pago').value;
-	// Obtener lista de compra
-	if (!window.listaCompra || window.listaCompra.length === 0) {
-		alert('Agrega al menos un producto o servicio a la lista.');
-		return;
-	}
-	// Validar cliente
-	if (!cliente.dni || !cliente.nombre) {
-		alert('Completa los datos del cliente.');
-		return;
-	}
-	// Enviar datos al backend
-	fetch('/registrar_venta/', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-		},
-		body: JSON.stringify({
-			cliente: cliente,
-			metodo_pago: metodo_pago,
-			items: window.listaCompra
-		})
-	})
-	.then(response => response.json())
-	.then(data => {
-		if (data.success) {
-			alert('Venta registrada correctamente.');
-			window.location.reload();
-		} else {
-			alert('Error al registrar la venta: ' + (data.error || '')); 
-		}
-	})
-	.catch(() => {
-		alert('Error de conexión al registrar la venta.');
 	});
-});
 </script>
 {% endblock %}

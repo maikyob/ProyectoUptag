@@ -5,56 +5,53 @@
 
 {% block content %}
 
-<h1>Lista de Clientes</h1> 
+<h1>Lista de Clientes</h1>
 <div class="page-header">
-<div class="page-title">
-<h4>Clientes
-</h4>
-<h6>Maneja tus Clientes</h6>
-</div>
-<div class="page-btn">
-<a href="/addclient" class="btn btn-added"><img src="{% static 'img/icons/plus.svg' %}" alt="img" class="me-1">Agregar Cliente</a>
-</div>
+    <div class="page-title">
+        <h4>Clientes
+        </h4>
+        <h6>Maneja tus Clientes</h6>
+    </div>
+    <div class="page-btn">
+        <a href="{% url 'addclient' %}" class="btn btn-added"><img src="{% static 'img/icons/plus.svg' %}" alt="img"
+                class="me-1">Agregar Cliente</a>
+    </div>
 </div>
 
 <div class="table-responsive">
-<table class="table  datanew">
-<thead>
-<tr>
-<th>
-<label class="checkboxs">
-<input type="checkbox" id="select-all">
-<span class="checkmarks"></span>
-</label>
-</th>
-<th>Nombre del cliente</th>
-<th>Email</th>
-<th>telefono</th>
-<th>Direccion</th>
-<th>DNI/Cedula de identidad</th>
-<th>Acción</th>
-</tr>
-</thead>
+    <table class="table  datanew">
+        <thead>
+            <tr>
+                <th>Nombre del cliente</th>
+                <th>Email</th>
+                <th>telefono</th>
+                <th>Direccion</th>
+                <th>DNI/Cedula de identidad</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
 
-<tbody>
-{% for cliente in clientes %}
-<tr>
-<td>
-<label class="checkboxs">
-<input type="checkbox">
-<span class="checkmarks"></span>
-</label>
-</td>
-<td>{{ cliente.nombre }}</td>
-<td>{{ cliente.email }}</td>
-<td>{{ cliente.telefono }}</td>
-<td>{{ cliente.direccion }}</td>
-<td>{{ cliente.dni }}</td>
-<td></td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.nombre }}</td>
+                <td>{{ cliente.email }}</td>
+                <td>{{ cliente.telefono }}</td>
+                <td>{{ cliente.direccion }}</td>
+                <td>{{ cliente.dni }}</td>
+                <td>
+                    <a class="me-3" href="{% url 'edit_client' cliente.pk %}">
+                        <img src="{% static 'img/icons/edit.svg' %}" alt="img">
+                    </a>
+                    <a class="confirm-text" href="{% url 'delete_client' cliente.pk %}"
+                        onclick="return confirm('¿Estás seguro de que deseas eliminar este cliente?')">
+                        <img src="{% static 'img/icons/delete.svg' %}" alt="img">
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 </div>
 </div>
@@ -62,11 +59,11 @@
 
 {% endblock %}
 
-{% block scripts %} 
+{% block scripts %}
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
 
-<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
 
 <script src="{% static 'js/inventario-datatable.js' %}"></script>
 {% endblock %}

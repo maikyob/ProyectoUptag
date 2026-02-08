@@ -1,4 +1,4 @@
-;(function($){
+/* ;(function($){
     $(function(){
         var $form = $('form');
         if ($form.length === 0) return;
@@ -85,3 +85,26 @@
 
     });
 })(jQuery);
+ */
+    $(document).ready(function() {
+        // Validación del formulario
+        $('#login-form').on('submit', function(e) {
+            var username = $('#id_username').val().trim();
+            var password = $('#id_password').val().trim();
+            
+            if (!username) {
+                e.preventDefault();
+                alert('Por favor ingresa tu usuario');
+                $('#id_username').focus();
+                return false;
+            }
+            
+            if (!password) {
+                e.preventDefault();
+                alert('Por favor ingresa tu contraseña');
+                $('#id_password').focus();
+                return false;
+            }
+        });
+    });
+    

@@ -11,7 +11,7 @@
 <div class="form-login">
 <label>Nombre Completo</label>
 <div class="form-addons">
-<input type="text" placeholder="Ingrese su nombre completo" id="nombre" name="nombre" required>
+<input type="text" placeholder="Ingrese su nombre completo" id="username" name="username" required>
 <img src="{% static 'img/icons/users1.svg' %}" alt="img">
 </div>
 </div>
@@ -25,12 +25,12 @@
 <div class="form-login">
 <label>Contraseña</label>
 <div class="pass-group">
-<input type="password" class="pass-input" placeholder="Ingrese su contraseña" id="contraseña" name="contraseña" required>
+<input type="password" class="pass-input" placeholder="Ingrese su contraseña" id="password" name="password" required>
 <span class="fas toggle-password fa-eye-slash"></span>
 </div>
 </div>
 <div class="form-login">
-<a href="/signout"><button type="submit" class="btn btn-login">Registrarse</button ></a>
+<button type="submit" class="btn btn-login">Registrarse</button >
 </div>
 </form>
 <div class="signinform text-center">
@@ -39,4 +39,5 @@
 {% endblock %}
 {% block css %}{% endblock %}
 {% block scripts %}
+<script src="{% static 'js/register.js' %}"></script>
 {% endblock %}

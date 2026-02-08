@@ -1,0 +1,229 @@
+{% extends '../layout_accounts.html'%} {%load static%} . {%block title%}Términos
+y Condiciones de Uso{%endblock%} {%block css%}
+<!-- Datatable -->
+<link href="{% static 'css/style.css'%}" rel="stylesheet" /><link
+  href="{% static 'css/custom.css'%}"
+  rel="stylesheet"
+/>
+<style>
+  h3,
+  h4,
+  h5 {
+    font-weight: bold;
+  }
+
+  p {
+    text-indent: 30px;
+    text-align: justify;
+  }
+  header {
+    display: flex;
+    height: 240px;
+    width: 120%;
+    padding-top: 20px;
+    margin-left: -16px;
+    background: #030608;
+    opacity: 0.8;
+    background-size: 20px 35px;
+  }
+  #logo{
+    width: 10%;
+    height: 90%;
+    margin-left: 5%;
+    background-image: url("/media/logo-depi.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+  #terminos{
+    width: 80%;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #terminos h1{
+    font-size: 4rem;
+    color: #fff;
+  }
+  #submit{
+    width: 60%;
+    border: none;
+    color: black;
+    font-weight: 500;
+    padding: 5px;
+  }
+  p,li{
+    color: #000;
+  }
+  
+  .terminos-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .terminos-content h1,
+  .terminos-content h2,
+  .terminos-content h3,
+  .terminos-content h4,
+  .terminos-content h5,
+  .terminos-content h6 {
+    color: #495057;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  
+  .terminos-content p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    text-align: justify;
+  }
+  
+  .terminos-content ul,
+  .terminos-content ol {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+  }
+  
+  .terminos-content li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .terminos-content strong {
+    color: #495057;
+  }
+</style>
+{%endblock%} 
+{%block content%}
+<header >
+  <div id="logo">
+
+  </div>
+  <div id="terminos">
+    <h1>Términos y Condiciones de Uso </h1>
+   
+  </div>
+</header>
+<br>
+<br>
+
+<h3 class="text-center">Depi del Caribe SA de CV</h3>
+
+{% if politica %}
+  <div class="text-center mb-3">
+    <span class="badge bg-primary me-2">Versión: {{ version_politica }}</span><br>
+    <span class="text-muted">Fecha de última actualización: {{ fecha_politica|date:'d \d\e F \d\e Y' }}</span>
+  </div>
+{% else %}
+  <p class="text-center text-muted">Fecha de última actualización: 26 de Noviembre de 2024</p>
+{% endif %}
+
+<div class="container">
+<br>
+
+{% if terminos_condiciones %}
+  <!-- Mostrar términos y condiciones dinámicos de la política activa -->
+  <div class="terminos-content">
+    {{ terminos_condiciones|safe }}
+  </div>
+{% else %}
+  <!-- Contenido estático por defecto si no hay política activa -->
+  <h5>1. Aceptación de los Términos</h5>
+
+  <p>
+    Al utilizar la App, el Usuario acepta estos Términos y Condiciones en su
+    totalidad. Si no está de acuerdo, deberá abstenerse de utilizar la App.
+  </p>
+
+  <h5>2. Definiciones</h5>
+  <ol>
+    <li>
+      <strong> *Usuario:</strong> Persona que accede y utiliza los servicios de la
+      App.
+    </li>
+    <li>
+      <strong> * Servicios:</strong> Funcionalidades, herramientas, notificaciones
+      y contenidos proporcionados a través de la App.
+    </li>
+  </ol>
+
+  <h5>3. Uso de la App</h5>
+  <p>El Usuario se compromete a:</p>
+  <ol>
+    <li>
+      <strong> *</strong> Proporcionar información veraz y actualizada al
+      registrarse.
+    </li>
+    <li>
+      <strong> *</strong> Utilizar la App exclusivamente para los fines permitidos
+      por la legislación vigente y estos términos.
+    </li>
+    <li>
+      <strong> *</strong> No realizar actividades que puedan comprometer la
+      seguridad o funcionalidad de la App.
+    </li>
+  </ol>
+  <h5>4. Notificaciones y Comunicaciones</h5>
+  <p>
+    El Usuario acepta de manera expresa que la App envíe notificaciones
+    relacionadas con el servicio, tramites operativos, legales y administrativos a
+    través de:
+  </p>
+
+  <ol>
+    <li>
+      <strong> * Correo electrónico:</strong>El Usuario proporcionará una
+      dirección válida para recibir información importante, notificaciones,
+      alertas o comunicaciones promocionales, en caso de haberlo consentido.
+    </li>
+    <li>
+      <strong> * La App:</strong>Notificaciones emergentes o mensajes en la
+      plataforma como parte del funcionamiento normal del servicio.
+    </li>
+  </ol>
+
+  <h5>5. Propiedad Intelectual</h5>
+  <p>
+    Todos los derechos de propiedad intelectual sobre la App y sus contenidos son
+    propiedad exclusiva de DEPI DEL CARIBE SA DE CV. El Usuario no podrá
+    reproducir, modificar, distribuir ni explotar de forma alguna los contenidos
+    sin autorización previa.
+  </p>
+  <h5>6. Limitación de Responsabilidad</h5>
+  <p>La App no será responsable por:</p>
+  <ol>
+    <li>
+      <strong> *</strong> Errores técnicos, interrupciones o fallos fuera de su
+      control.
+    </li>
+    <li><strong> *</strong> Uso indebido de la App por parte del Usuario.</li>
+  </ol>
+  <h5>7. Modificaciones a los Términos y Condiciones</h5>
+  <p>
+    Nos reservamos el derecho de modificar estos Términos y Condiciones. Los
+    cambios serán notificados al Usuario a través de la App o el correo
+    electrónico registrado.
+  </p>
+  <h5>8. Ley Aplicable y Jurisdicción</h5>
+  <p>
+    Estos Términos y Condiciones se rigen por las leyes aplicables en México.
+    Cualquier controversia será resuelta en los tribunales competentes del estado
+    de Quintana Roo, México.
+  </p>
+  <p>
+    Al registrarse en la App, el Usuario declara haber leído, entendido y aceptado
+    el Aviso de Privacidad y los Términos y Condiciones aquí expuestos.
+  </p>
+{% endif %}
+
+{% if not politica %}
+  <div class="alert alert-warning mt-4">
+    <i class="fa fa-exclamation-triangle me-2"></i>
+    <strong>Nota:</strong> No hay una política de términos y condiciones activa configurada. 
+    Se muestra el contenido estático por defecto.
+  </div>
+{% endif %}
+
+</div>
+{%endblock content%}

@@ -1,0 +1,70 @@
+{% extends "base_login_register.html" %}
+{% load static %}
+
+{% block title %} Crear una cuenta {% endblock %}
+
+{% block content %}
+<div class="login-userheading">
+    <h3>Crear una cuenta</h3>
+    <h4>Continúa donde lo dejaste</h4>
+</div>
+
+{% if error %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% endif %}
+
+<form action="{% url 'signup' %}" method="POST">
+    {% csrf_token %}
+    <div class="form-login">
+        <label>Nombre Completo</label>
+        <div class="form-addons">
+            <input type="text" placeholder="Ingrese su nombre completo" name="username" required>
+            <img src="{% static 'img/icons/users1.svg' %}" alt="img">
+        </div>
+    </div>
+    <div class="form-login">
+        <label>Correo Electrónico</label>
+        <div class="form-addons">
+            <input type="email" placeholder="Ingrese su correo electrónico" name="email" required>
+            <img src="{% static 'img/icons/mail.svg' %}" alt="img">
+        </div>
+    </div>
+    <div class="form-login">
+        <label>Contraseña</label>
+        <div class="pass-group">
+            <input name="password" type="password" class="pass-input" placeholder="Ingrese su contraseña" required>
+            <span class="fas toggle-password fa-eye-slash"></span>
+        </div>
+    </div>
+    <div class="form-login">
+        <button type="submit" class="btn btn-login">Registrarse</button>
+    </div>
+    <div class="signinform text-center">
+        <h4>¿Ya tienes una cuenta? <a href="{% url 'login' %}" class="hover-a">Iniciar Sesión</a></h4>
+    </div>
+    <div class="form-setlogin">
+        <h4>O regístrate con</h4>
+    </div>
+    <div class="form-sociallink">
+        <ul>
+            <li>
+                <a href="javascript:void(0);">
+                    <img src="{% static 'img/icons/google.png' %}" class="me-2" alt="google">
+                    Registrarse con Google
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);">
+                    <img src="{% static 'img/icons/facebook.png' %}" class="me-2" alt="facebook">
+                    Registrarse con Facebook
+                </a>
+            </li>
+        </ul>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

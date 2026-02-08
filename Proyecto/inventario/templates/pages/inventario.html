@@ -7,70 +7,72 @@
 {% block content %}
 
 <div class="page-header">
-<div class="page-title">
-<h4>Inventario
-</h4>
-<h6>Maneja tus Productos</h6>
-</div>
-<div class="page-btn">
-<a href="/addproduct" class="btn btn-added"><img src="{% static 'img/icons/plus.svg' %}" alt="img" class="me-1">Agregar Producto</a>
-</div>
+    <div class="page-title">
+        <h4>Inventario
+        </h4>
+        <h6>Maneja tus Productos</h6>
+    </div>
+    <div class="page-btn">
+        <a href="/addproduct" class="btn btn-added"><img src="{% static 'img/icons/plus.svg' %}" alt="img"
+                class="me-1">Agregar Producto</a>
+    </div>
 </div>
 <div class="card">
-<div class="card-body">
-<div class="table-top">
-<div class="search-set">
-<div class="search-path">
-<a class="btn btn-filter" id="filter_search">
-<img src="{% static 'img/icons/filter.svg' %}" alt="img">
-<span><img src="{% static 'img/icons/closes.svg' %}" alt="img"></span>
-</a>
-</div>
-<div class="search-input">
-<a class="btn btn-searchset"><img src="{% static 'img/icons/search-white.svg' %}" alt="img"></a>
-</div>
-</div>
-<div class="wordset">
-<ul>
-<li>
-<a href="javascript:void(0);" class="export-pdf" data-bs-toggle="tooltip" data-bs-placement="top" title="pdf"><img src="{% static 'img/icons/pdf.svg' %}" alt="img"></a>
-</li>
-<li>
-<a href="javascript:void(0);" class="export-excel" data-bs-toggle="tooltip" data-bs-placement="top" title="excel"><img src="{% static 'img/icons/excel.svg' %}" alt="img"></a>
-</li>
-<li>
-<a href="javascript:void(0);" class="export-print" data-bs-toggle="tooltip" data-bs-placement="top" title="print"><img src="{% static 'img/icons/printer.svg' %}" alt="img"></a>
-</li>
-</ul>
-</div>
-</div>
+    <div class="card-body">
+        <div class="table-top">
+            <div class="search-set">
+                <div class="search-path">
+                    <a class="btn btn-filter" id="filter_search">
+                        <img src="{% static 'img/icons/filter.svg' %}" alt="img">
+                        <span><img src="{% static 'img/icons/closes.svg' %}" alt="img"></span>
+                    </a>
+                </div>
+                <div class="search-input">
+                    <a class="btn btn-searchset"><img src="{% static 'img/icons/search-white.svg' %}" alt="img"></a>
+                </div>
+            </div>
+            <div class="wordset">
+                <ul>
+                    <li>
+                        <a href="javascript:void(0);" class="export-pdf" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="pdf"><img src="{% static 'img/icons/pdf.svg' %}"
+                                alt="img"></a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0);" class="export-excel" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="excel"><img src="{% static 'img/icons/excel.svg' %}"
+                                alt="img"></a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0);" class="export-print" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="print"><img src="{% static 'img/icons/printer.svg' %}"
+                                alt="img"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
 
 
-<div class="table-responsive">
-<table class="table  datanew">
-<thead>
-<tr>
-</th>
-<th>Nombre del Producto</th>
-<th>Precio de Compra</th>
-<th>Precio de Venta</th>
-<th>Stock</th>
-<th>Proveedor</th>
-<th>Acción</th>
-</tr>
-</thead>
+        <div class="table-responsive">
+            <table class="table  datanew">
+                <thead>
+                    <th>Nombre del Producto</th>
+                    <th>Precio de Compra</th>
+                    <th>Precio de Venta</th>
+                    <th>Stock</th>
+                    <th>Acción</th>
+                    </tr>
+                </thead>
 
-<tbody>
-{% for producto in productos %}
-<tr>
-<td>{{ producto.nombre }}</td>
-<td>{{ producto.precio_compra }}</td>
-<td>{{ producto.precio_venta }}</td>
-<td>{{ producto.stock }}</td>
-<td>{{ producto.proveedor }}</td>
-<td>
-                    
+                <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.precio_compra }}</td>
+                        <td>{{ producto.precio_venta }}</td>
+                        <td>{{ producto.cantidad_en_stock }}</td>
+                        <td>
                             <a class="me-3" href="{% url 'editar_producto' producto.pk %}" title="Editar">
                                 <img src="{% static 'img/icons/edit.svg' %}" alt="img">
                             </a>
@@ -79,13 +81,13 @@
                                 title="Eliminar">
                                 <img src="{% static 'img/icons/delete.svg' %}" alt="img">
                             </a>
-</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-</div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 {% endblock %}
@@ -94,7 +96,7 @@
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
 
-<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
 
 <script src="{% static 'js/inventario-datatable.js' %}"></script>
 

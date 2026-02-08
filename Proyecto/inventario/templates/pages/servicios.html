@@ -5,61 +5,57 @@
 
 {% block content %}
 
-<h1>Lista de Servicios</h1> 
+<h1>Lista de Servicios</h1>
 <div class="page-header">
-<div class="page-title">
-<h4>Servicios
-</h4>
-<h6>Maneja tus Servicios</h6>
-</div>
-<div class="page-btn">
-<a href="/addservice" class="btn btn-added"><img src="{% static 'img/icons/plus.svg' %}" alt="img" class="me-1">Agregar Servicio</a>
-</div>
+    <div class="page-title">
+        <h4>Servicios
+        </h4>
+        <h6>Maneja tus Servicios</h6>
+    </div>
+    <div class="page-btn">
+        <a href="{% url 'addservice' %}" class="btn btn-added"><img src="{% static 'img/icons/plus.svg' %}" alt="img"
+                class="me-1">Agregar Servicio</a>
+    </div>
 </div>
 
 <div class="table-responsive">
-<table class="table  datanew">
-<thead>
-<tr>
-<th>
-<label class="checkboxs">
-<input type="checkbox" id="select-all">
-<span class="checkmarks"></span>
-</label>
-</th>
-<th>Nombre del Servicio</th>
-<th>Descripcion</th>
-<th>Precio</th>
-<th>Acción</th>
-</tr>
-</thead>
+    <table class="table  datanew">
+        <thead>
+            <th>Nombre del Servicio</th>
+            <th>Descripcion</th>
+            <th>Precio</th>
+            <th>Acción</th>
+            </tr>
+        </thead>
 
-<tbody>
-{% for servicio in servicios %}
-<tr>
-<td>
-<label class="checkboxs">
-<input type="checkbox">
-<span class="checkmarks"></span>
-</label>
-</td>
-<td>{{ servicio.nombre }}</td>
-<td>{{ servicio.descripcion }}</td>
-<td>{{ servicio.precio }}</td>
+        <tbody>
+            {% for servicio in servicios %}
+            <tr>
+                <td>{{ servicio.nombre }}</td>
+                <td>{{ servicio.descripcion }}</td>
+                <td>{{ servicio.precio }}</td>
 
-<td></td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+                <td>
+                    <a class="me-3" href="{% url 'edit_service' servicio.pk %}">
+                        <img src="{% static 'img/icons/edit.svg' %}" alt="img">
+                    </a>
+                    <a class="confirm-text" href="{% url 'delete_service' servicio.pk %}"
+                        onclick="return confirm('¿Estás seguro de que deseas eliminar este servicio?')">
+                        <img src="{% static 'img/icons/delete.svg' %}" alt="img">
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 </div>
 </div>
-{% block scripts %} 
+{% block scripts %}
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
 
-<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
 
 <script src="{% static 'js/inventario-datatable.js' %}"></script>
 {% endblock %}

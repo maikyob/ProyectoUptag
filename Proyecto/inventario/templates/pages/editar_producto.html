@@ -15,37 +15,47 @@
 
 <form action="{% url 'editar_producto' producto.pk %}" method="POST">
     {% csrf_token %}
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        {% for field, errors in form.errors.items %}
+        {% for error in errors %}
+        <p><strong>{{ field }}:</strong> {{ error }}</p>
+        {% endfor %}
+        {% endfor %}
+    </div>
+    {% endif %}
     <div class="card">
         <div class="card-body">
             <div class="row">
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
                         <label>Nombre del Producto</label>
-                        <input type="text" id="nombre" name="nombre" value="{{ producto.nombre }}" required>
+                        <input type="text" id="nombre" name="nombre" value="{{ producto.nombre }}" class="form-control"
+                            required>
                     </div>
                 </div>
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
                         <label>Precio de Compra</label>
                         <input type="text" id="precio_compra" name="precio_compra" value="{{ producto.precio_compra }}"
-                            required>
+                            class="form-control" required>
                     </div>
                 </div>
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
                         <label>Precio de Venta</label>
                         <input type="text" id="precio_venta" name="precio_venta" value="{{ producto.precio_venta }}"
-                            required>
+                            class="form-control" required>
                     </div>
                 </div>
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
                         <label>Proveedor</label>
-                        <select name="proveedor" id="proveedor">
+                        <select name="proveedor" id="proveedor" class="form-control">
                             <option value="">Seleccione un proveedor</option>
-                            {% for proveedor in form.fields.proveedor.queryset %}
-                            <option value="{{ proveedor.id }}" {% if producto.proveedor.id == proveedor.id %}selected{%
-                                endif %}>{{ proveedor.nombre }}</option>
+                            {% for prov in form.fields.proveedor.queryset %}
+                            <option value="{{ prov.id }}" {% if producto.proveedor.id==prov.id %}selected{% endif %}>{{
+                                prov.nombre }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -54,19 +64,20 @@
                     <div class="form-group">
                         <label>Stock</label>
                         <input type="text" id="cantidad_en_stock" name="cantidad_en_stock"
-                            value="{{ producto.cantidad_en_stock }}" required>
+                            value="{{ producto.cantidad_en_stock }}" class="form-control" required>
                     </div>
                 </div>
                 <div class="col-lg-12">
                     <div class="form-group">
                         <label>Descripcion del producto</label>
-                        <textarea name="descripcion" id="descripcion" required>{{ producto.descripcion }}</textarea>
+                        <textarea name="descripcion" id="descripcion" class="form-control"
+                            required>{{ producto.descripcion }}</textarea>
                     </div>
                 </div>
                 <div class="col-lg-12">
                     <div class="form-group"></div>
                     <button type="submit" class="btn btn-submit me-2">Actualizar Producto</button>
-                    <a href="/productlist" class="btn btn-cancel">Cancelar</a>
+                    <a href="{% url 'productlist' %}" class="btn btn-cancel">Cancelar</a>
                 </div>
             </div>
         </div>

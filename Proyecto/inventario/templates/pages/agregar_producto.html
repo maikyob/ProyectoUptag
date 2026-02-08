@@ -9,59 +9,79 @@
 <h1>Agregar Producto</h1>
 
 <div class="page-header">
-<div class="page-title">
-<h6>Crea un nuevo producto</h6>
-</div>
+    <div class="page-title">
+        <h6>Crea un nuevo producto</h6>
+    </div>
 </div>
 <form action="" method="POST">
-{% csrf_token %}
-<div class="card">
-<div class="card-body">
-<div class="row">
-<div class="col-lg-3 col-sm-6 col-12">
-<div class="form-group">
-<label>Nombre del Producto</label>
-<input type="text" id="nombre" name="nombre" required>
-</div>
-</div>
-<div class="col-lg-3 col-sm-6 col-12">
-<div class="form-group">
-<label>Precio de Compra</label>
-<input type="text" id="precio_compra" name="precio_compra" required>
-</div>
-</div>
-<div class="col-lg-3 col-sm-6 col-12">
-<div class="form-group">
-<label>Precio de Venta</label>
-<input type="text" id="precio_venta" name="precio_venta" required>
-</div>
-</div>
-<div class="col-lg-3 col-sm-6 col-12">
-<div class="form-group">
-<label>Proveedor</label>
-<input type="text" id="proveedor_id" name="proveedor_id" >
-</div>
-</div>
-<div class="col-lg-3 col-sm-6 col-12">
-<div class="form-group">
-<label>Stock</label>
-<input type="text" id="cantidad_en_stock" name="cantidad_en_stock" required>
-</div>
-</div>
-<div class="col-lg-3 col-sm-6 col-12">
-<div class="form-group">
-<label>Descripcion del producto</label>
-<textarea name="descripcion" id="descripcion" required></textarea>
-</div>
-</div>
-<div class="col-lg-12">
-<div class="form-group"></div>
-<button type="submit" class="btn btn-submit me-2">Guardar Producto</button>
-<a href="/productlist" class="btn btn-cancel">Cancelar</a>
-</div>
-</div>
-</div>
-</div>
+    {% csrf_token %}
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        {% for field, errors in form.errors.items %}
+        {% for error in errors %}
+        <p><strong>{{ field }}:</strong> {{ error }}</p>
+        {% endfor %}
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label>Nombre del Producto</label>
+                        <input type="text" id="nombre" name="nombre" value="{{ form.nombre.value|default:'' }}"
+                            class="form-control" required>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label>Precio de Compra</label>
+                        <input type="text" id="precio_compra" name="precio_compra"
+                            value="{{ form.precio_compra.value|default:'' }}" class="form-control" required>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label>Precio de Venta</label>
+                        <input type="text" id="precio_venta" name="precio_venta"
+                            value="{{ form.precio_venta.value|default:'' }}" class="form-control" required>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label>Proveedor</label>
+                        <select name="proveedor" id="proveedor" class="form-control">
+                            <option value="">Seleccione un proveedor</option>
+                            {% for prov in form.fields.proveedor.queryset %}
+                            <option value="{{ prov.id }}">{{
+                                prov.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label>Stock</label>
+                        <input type="text" id="cantidad_en_stock" name="cantidad_en_stock"
+                            value="{{ form.cantidad_en_stock.value|default:'' }}" class="form-control" required>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label>Descripcion del producto</label>
+                        <textarea name="descripcion" id="descripcion" class="form-control"
+                            required>{{ form.descripcion.value|default:'' }}</textarea>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form-group"></div>
+                    <button type="submit" class="btn btn-submit me-2">Guardar Producto</button>
+                    <a href="{% url 'productlist' %}" class="btn btn-cancel">Cancelar</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </form>
 
 {% endblock %}

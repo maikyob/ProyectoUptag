@@ -166,14 +166,22 @@
 			fetch(`/get_productos_servicio/${servicioId}/`)
 				.then(response => response.json())
 				.then(data => {
+					let defaultProductId = null;
 					data.productos.forEach(prod => {
 						const option = document.createElement('option');
 						option.value = prod.id;
 						option.text = `${prod.nombre} ($${prod.precio})`;
 						option.dataset.precio = prod.precio;
 						option.dataset.nombre = prod.nombre;
+						if (prod.predeterminado) {
+							defaultProductId = prod.id;
+						}
 						productoSelect.appendChild(option);
 					});
+
+					if (defaultProductId) {
+						productoSelect.value = defaultProductId;
+					}
 				});
 		}
 	});
